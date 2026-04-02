@@ -1,12 +1,13 @@
 """
-Stage 1 — Seed Harvesting (Autonomous Discovery Agent)
+Stage 1 — Seed Harvesting (Fully Autonomous Discovery Agent)
 
 Architecture (per Bosse et al. 2026, adapted):
   1. ReAct agents (one per domain) autonomously search the web for Trump
      presidential decisions between training_cutoff_date and today_date
-  2. Structured data accelerators (Federal Register, Congress.gov) supplement
-     the autonomous discovery with guaranteed-complete government records
-  3. A merger step deduplicates, tags domains, and flags uncertain attribution
+  2. A merger step deduplicates, tags domains, and flags uncertain attribution
+
+The agents are fully autonomous — they decide what to search, which sources
+to trust, and how deep to dig. No hardcoded data sources.
 
 Entry point: run_stage1(state: PipelineState) -> PipelineState
 """
@@ -25,7 +26,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from pydantic import BaseModel, Field
 
-from src.accelerators import fetch_congress_bills, fetch_federal_register
+
 from src.config import SEEDS_DIR
 from src.schemas import DecisionSeed, DomainType, PipelineState, Source
 from src.tools import get_stage1_tools
@@ -384,11 +385,10 @@ async def run_stage1(state: PipelineState) -> PipelineState:
     """
     Stage 1 entry point — run as a LangGraph node.
 
-    1. Run accelerators (Federal Register + Congress.gov) in parallel
-    2. Run ReAct discovery agents (one per domain, 7 parallel) 
-    3. Merge + deduplicate all seeds
-    4. Serialize to disk
-    5. Return updated state
+    1. Run ReAct discovery agents (one per domain, 7 parallel)
+    2. Merge + deduplicate all seeds
+    3. Serialize to disk
+    4. Return updated state
     """
     config = state.config
     cutoff = config.training_cutoff_date
@@ -400,28 +400,7 @@ async def run_stage1(state: PipelineState) -> PipelineState:
         leader, cutoff, today,
     )
 
-    # 1. Run accelerators in parallel
-    accel_fed, accel_congress = await asyncio.gather(
-        fetch_federal_register(cutoff, today),
-        fetch_congress_bills(cutoff, today),
-        return_exceptions=True,
-    )
-
-    # Handle any accelerator failures gracefully
-    accel_seeds: list[DecisionSeed] = []
-    if isinstance(accel_fed, list):
-        accel_seeds.extend(accel_fed)
-    else:
-        logger.error("Federal Register accelerator failed: %s", accel_fed)
-
-    if isinstance(accel_congress, list):
-        accel_seeds.extend(accel_congress)
-    else:
-        logger.error("Congress.gov accelerator failed: %s", accel_congress)
-
-    logger.info("Accelerators produced %d seeds", len(accel_seeds))
-
-    # 2. Run ReAct agents in parallel (one per domain)
+    # 1. Run ReAct agents in parallel (one per domain)
     agent_tasks = [
         run_domain_agent(
             domain=domain,
@@ -433,21 +412,20 @@ async def run_stage1(state: PipelineState) -> PipelineState:
     ]
     agent_results = await asyncio.gather(*agent_tasks, return_exceptions=True)
 
-    agent_seeds: list[DecisionSeed] = []
+    all_seeds: list[DecisionSeed] = []
     for domain, result in zip(DomainType, agent_results):
         if isinstance(result, list):
-            agent_seeds.extend(result)
+            all_seeds.extend(result)
             logger.info("Agent %s: %d seeds", domain.value, len(result))
         else:
             logger.error("Agent %s failed: %s", domain.value, result)
 
-    logger.info("Agents produced %d seeds total", len(agent_seeds))
+    logger.info("Agents produced %d seeds total", len(all_seeds))
 
-    # 3. Merge + dedup
-    all_seeds = accel_seeds + agent_seeds
+    # 2. Merge + dedup
     state.seeds = merge_and_dedup(all_seeds)
 
-    # 4. Serialize
+    # 3. Serialize
     save_seeds(state.seeds, SEEDS_DIR)
 
     logger.info(

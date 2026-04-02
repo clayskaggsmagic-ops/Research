@@ -60,3 +60,21 @@ def get_stage1_tools() -> list:
         build_search_tool(),
         build_extract_tool(),
     ]
+
+
+def get_stage2_tools() -> list:
+    """Return the tool set for the Stage 2 proto-question generation agent."""
+    search = TavilySearch(
+        name="web_search",
+        description=(
+            "Search the web for political context, expert analysis, and prediction "
+            "market prices around a specific date. Use this to research what was "
+            "happening around the simulation_date — political dynamics, expert "
+            "opinions, pending decisions, and market sentiment."
+        ),
+        max_results=5,
+        search_depth="advanced",
+        topic="news",
+    )
+    extract = build_extract_tool()
+    return [search, extract]

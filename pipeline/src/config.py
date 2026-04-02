@@ -21,23 +21,27 @@ load_dotenv(_ENV_PATH)
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-CONGRESS_API_KEY = os.getenv("CONGRESS_API_KEY", "")  # developer key from congress.gov
+
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")  # for web search tools
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")  # optional, for news fallback
 
 
 # ── Stage 1 Settings ──────────────────────────────────────────────────────────
 
-SEED_AGENT_MODEL = os.getenv("SEED_AGENT_MODEL", "gemini-3-flash")
+SEED_AGENT_MODEL = os.getenv("SEED_AGENT_MODEL", "gemini-2.5-flash")
 DEDUP_SIMILARITY_THRESHOLD = float(os.getenv("DEDUP_SIMILARITY_THRESHOLD", "0.85"))
 
 
-# ── Data Source URLs ───────────────────────────────────────────────────────────
+# ── Prediction Market URLs (for later stages) ─────────────────────────────────
 
-FEDERAL_REGISTER_API = "https://www.federalregister.gov/api/v1/documents"
-CONGRESS_API = "https://api.congress.gov/v3/bill"
-USTR_PRESS_URL = "https://ustr.gov/press-office/press-releases"
-OFAC_SDN_URL = "https://sanctionssearch.ofac.treas.gov/"
+# ── Model Defaults ─────────────────────────────────────────────────────────────
+
+DRAFTER_MODEL = os.getenv("DRAFTER_MODEL", "gemini-2.5-flash")
+VERIFIER_MODEL = os.getenv("VERIFIER_MODEL", "claude-sonnet-4-20250514")
+
+
+# ── Prediction Market URLs (for later stages) ─────────────────────────────────
+
 KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2"
 POLYMARKET_API = "https://clob.polymarket.com"
 
@@ -55,7 +59,10 @@ SCORES_DIR = OUTPUT_DIR / "scores"
 # ── Ensure output dirs exist ──────────────────────────────────────────────────
 
 for _dir in [SEEDS_DIR, QUESTIONS_DIR, MANIFEST_DIR, PREDICTIONS_DIR, SCORES_DIR]:
-    _dir.mkdir(parents=True, exist_ok=True)
+    try:
+        _dir.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        pass  # dirs already exist but sandbox blocks stat
 
 
 # ── Ensure Tavily key is set in env (langchain-tavily reads from os.environ) ─

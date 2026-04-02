@@ -93,13 +93,9 @@ Give the agent these tools:
 - web_search: General web search
 - web_scrape: Read a specific URL's content
 
-OPTIONAL ACCELERATORS: In addition to autonomous discovery, you may also wire 
-in structured data source fetchers as supplementary seed sources. These are 
-pure code (no LLM) and guaranteed to have relevant records:
-- Federal Register API (federalregister.gov/api/v1/documents) for executive orders
-- Congress.gov API for bills presented to the president
-These feed INTO the same merger/dedup step — they boost coverage but the 
-autonomous agent is the primary discovery mechanism.
+The agent is FULLY AUTONOMOUS — no hardcoded API fetchers, no pre-wired data 
+sources. The agent discovers everything itself through web search, exactly as 
+Bosse et al. (2026) intended with "arbitrary text" seeds.
 
 Output: deduplicated list of DecisionSeed objects → stored in state.seeds.
 ```

@@ -1,14 +1,14 @@
 """
 Smoke test for the full Stage 1 pipeline.
 
-Mocks both the LLM agent and HTTP accelerators to test the orchestration
-logic end-to-end without real API calls.
+Mocks the LLM agent to test orchestration logic end-to-end
+without real API calls. The pipeline is fully autonomous —
+no hardcoded data sources.
 """
 
 from __future__ import annotations
 
-import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -54,22 +54,6 @@ def _make_agent_response(domain: str, n_seeds: int = 2) -> AgentResponse:
     )
 
 
-def _make_accel_seed(seed_id: str, domain: DomainType) -> DecisionSeed:
-    """Create a mock accelerator seed."""
-    return DecisionSeed(
-        seed_id=seed_id,
-        event_description=f"Accelerator event {seed_id}",
-        decision_taken=f"Accelerator decision {seed_id}",
-        decision_date="2025-02-15",
-        simulation_date="2025-02-10",
-        domain=domain,
-        plausible_alternatives=["Take no action", "Other option"],
-        sources=[Source(name="Federal Register", url=f"https://gov/{seed_id}", date="2025-02-15")],
-        attribution_evidence="Published in Federal Register",
-        leader_attributable=True,
-    )
-
-
 # ── Tests ──────────────────────────────────────────────────────────────────────
 
 
@@ -83,41 +67,28 @@ async def test_run_stage1_produces_seeds():
         )
     )
 
-    # Mock accelerators
-    mock_fed_seeds = [
-        _make_accel_seed("FED-001", DomainType.EXECUTIVE_ORDERS),
-        _make_accel_seed("FED-002", DomainType.TRADE_TARIFFS),
-    ]
-    mock_congress_seeds = [
-        _make_accel_seed("CONG-001", DomainType.LEGISLATIVE),
-    ]
+    # Mock the domain agent to return a fixed response (unique per domain)
+    domain_idx = {d: i for i, d in enumerate(DomainType)}
 
-    # Mock the domain agent to return a fixed response
     async def mock_domain_agent(domain, leader, cutoff_date, today_date, **kwargs):
+        idx = domain_idx.get(domain, 0)
+        month = f"{(idx % 9) + 2:02d}"  # 02 through 08 — unique per domain
         return [
             DecisionSeed(
                 seed_id=f"AGENT-{domain.value}-001",
-                event_description=f"Agent discovered event in {domain.value}",
-                decision_taken=f"Decision in {domain.value}",
-                decision_date="2025-04-01",
-                simulation_date="2025-03-25",
+                event_description=f"Unique {domain.value} event: specific action #{idx}",
+                decision_taken=f"Unique decision for {domain.value} domain #{idx}",
+                decision_date=f"2025-{month}-15",
+                simulation_date=f"2025-{month}-10",
                 domain=domain,
                 plausible_alternatives=["Take no action", "Other"],
-                sources=[Source(name="Reuters", url=f"https://reuters.com/{domain.value}", date="2025-04-01")],
-                attribution_evidence="Directed by the President",
+                sources=[Source(name="Reuters", url=f"https://reuters.com/{domain.value}", date=f"2025-{month}-15")],
+                attribution_evidence=f"Directed by the President — {domain.value} specific",
                 leader_attributable=True,
             )
         ]
 
     with patch(
-        "src.stages.stage1_seeds.fetch_federal_register",
-        new_callable=AsyncMock,
-        return_value=mock_fed_seeds,
-    ), patch(
-        "src.stages.stage1_seeds.fetch_congress_bills",
-        new_callable=AsyncMock,
-        return_value=mock_congress_seeds,
-    ), patch(
         "src.stages.stage1_seeds.run_domain_agent",
         side_effect=mock_domain_agent,
     ), patch(
@@ -126,7 +97,7 @@ async def test_run_stage1_produces_seeds():
     ):
         result = await run_stage1(state)
 
-    # Should have seeds from accelerators + agents
+    # Should have seeds from agents
     assert len(result.seeds) > 0
 
     # All seeds should be valid DecisionSeed objects
@@ -136,14 +107,14 @@ async def test_run_stage1_produces_seeds():
         assert seed.simulation_date < seed.decision_date
         assert any("no action" in a.lower() for a in seed.plausible_alternatives)
 
-    # Should have multiple domains represented
+    # Should have multiple domains represented (7 agents = 7 domains)
     domains = {s.domain for s in result.seeds}
-    assert len(domains) >= 2  # accelerators + agents cover multiple domains
+    assert len(domains) >= 2
 
 
 @pytest.mark.asyncio
-async def test_run_stage1_handles_accelerator_failure():
-    """Stage 1 should still produce agent seeds even if accelerators fail."""
+async def test_run_stage1_handles_agent_failure():
+    """Stage 1 should still produce seeds from surviving agents if some fail."""
     state = PipelineState(
         config=PipelineConfig(
             training_cutoff_date="2025-01-20",
@@ -151,38 +122,41 @@ async def test_run_stage1_handles_accelerator_failure():
         )
     )
 
-    async def mock_domain_agent(domain, leader, cutoff_date, today_date, **kwargs):
+    call_count = 0
+    surviving_domains = []
+
+    async def mock_domain_agent_partial_failure(domain, leader, cutoff_date, today_date, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        # Fail on the first 2 domains, succeed on the rest
+        if call_count <= 2:
+            raise Exception("Agent crashed")
+        surviving_domains.append(domain)
+        month = f"{call_count + 1:02d}"  # unique month per surviving agent
         return [
             DecisionSeed(
                 seed_id=f"AGENT-{domain.value}-001",
-                event_description=f"Agent event in {domain.value}",
-                decision_taken=f"Decision in {domain.value}",
-                decision_date="2025-05-01",
-                simulation_date="2025-04-25",
+                event_description=f"Unique {domain.value} event for partial test #{call_count}",
+                decision_taken=f"Unique decision in {domain.value} #{call_count}",
+                decision_date=f"2025-{month}-01",
+                simulation_date=f"2025-{month.replace(month, f'{int(month)-1:02d}')}-25",
                 domain=domain,
                 plausible_alternatives=["Take no action"],
-                sources=[Source(name="AP", url="https://ap.com/test", date="2025-05-01")],
-                attribution_evidence="Presidential action",
+                sources=[Source(name="AP", url=f"https://ap.com/{domain.value}", date=f"2025-{month}-01")],
+                attribution_evidence=f"Presidential action — {domain.value}",
                 leader_attributable=True,
             )
         ]
 
     with patch(
-        "src.stages.stage1_seeds.fetch_federal_register",
-        new_callable=AsyncMock,
-        side_effect=Exception("API down"),
-    ), patch(
-        "src.stages.stage1_seeds.fetch_congress_bills",
-        new_callable=AsyncMock,
-        side_effect=Exception("API down"),
-    ), patch(
         "src.stages.stage1_seeds.run_domain_agent",
-        side_effect=mock_domain_agent,
+        side_effect=mock_domain_agent_partial_failure,
     ), patch(
         "src.stages.stage1_seeds.save_seeds",
         return_value=None,
     ):
         result = await run_stage1(state)
 
-    # Should still have seeds from the agents
+    # Should still have seeds from the 5 surviving agents
     assert len(result.seeds) > 0
+    assert len(result.seeds) >= 3  # at least 3 of the 5 surviving domains survive dedup

@@ -131,6 +131,16 @@ class Question(BaseModel):
     simulation_date: str = Field(description="The 'fake today' — inherited from the seed")
     domain: DomainType
 
+    # ── Background research (Stage 2.5: Background Research Agent) ──
+    background_research: str | None = Field(
+        default=None,
+        description="Structured research brief: context, data, numbers, trends — produced by A.10 agent",
+    )
+    research_flags: list[str] = Field(
+        default_factory=list,
+        description="Problems found during research: hallucinated facts, already-resolved events, etc.",
+    )
+
     # ── Resolution infrastructure (Stage 3: Refinement Agent) ──
     resolution_criteria: str | None = Field(
         default=None, description="Exact YES/NO conditions or option-matching rules"
@@ -198,7 +208,7 @@ class PipelineConfig(BaseModel):
 
     # Model assignments — cross-model verification requires different families
     drafter_model: str = Field(
-        default="gemini-3-pro",
+        default="gemini-2.5-flash",
         description="Model for Stages 2-3 (proto-question gen + refinement)",
     )
     verifier_model: str = Field(
@@ -206,11 +216,11 @@ class PipelineConfig(BaseModel):
         description="Model for Stage 4 — MUST be different family from drafter",
     )
     resolver_model: str = Field(
-        default="gemini-3-pro",
+        default="gemini-2.5-pro",
         description="Model for ground truth resolution + difficulty scoring",
     )
     prediction_model: str = Field(
-        default="gemini-3-pro",
+        default="gemini-2.5-pro",
         description="Model under test — version-pinned for all predictions",
     )
 
@@ -237,6 +247,9 @@ class PipelineState(BaseModel):
 
     # Stage 2 output
     proto_questions: list[Question] = Field(default_factory=list)
+
+    # Stage 2.5 output
+    researched_questions: list[Question] = Field(default_factory=list)
 
     # Stage 3 output
     refined_questions: list[Question] = Field(default_factory=list)
