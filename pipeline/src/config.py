@@ -37,7 +37,7 @@ DEDUP_SIMILARITY_THRESHOLD = float(os.getenv("DEDUP_SIMILARITY_THRESHOLD", "0.85
 # ── Model Defaults ─────────────────────────────────────────────────────────────
 
 DRAFTER_MODEL = os.getenv("DRAFTER_MODEL", "gemini-2.5-flash")
-VERIFIER_MODEL = os.getenv("VERIFIER_MODEL", "claude-sonnet-4-20250514")
+VERIFIER_MODEL = os.getenv("VERIFIER_MODEL", "gemini-2.5-flash")
 
 
 # ── Prediction Market URLs (for later stages) ─────────────────────────────────

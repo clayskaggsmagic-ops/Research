@@ -47,7 +47,8 @@ class GeneratedQuestion(BaseModel):
     )
     question_text: str = Field(
         description=(
-            "The forecasting question. For binary: 'Will X happen by Y?' "
+            "The forecasting question. MUST include Trump's name. "
+            "For binary: 'Will Trump X by Y?' "
             "For action_selection: 'Which action will Trump take regarding X?'"
         )
     )
@@ -61,6 +62,12 @@ class GeneratedQuestion(BaseModel):
             "from most aggressive to most passive. MUST always include 'Take no action' "
             "as the final option."
         ),
+    )
+    trump_attribution: str = Field(
+        description=(
+            "1-2 sentences explaining WHY this is Trump's personal decision. "
+            "If you can't explain why, DO NOT generate this question."
+        )
     )
     rationale: str = Field(
         description="Why this is a good forecasting question (entropy, difficulty, independence)"
@@ -127,9 +134,35 @@ identify one confounder and effectively "bet on" it across many questions.
 ## Question Types
 Generate a MIX of:
 - **BINARY**: "Will Trump [specific action] by [date]?" — clear yes/no
-- **ACTION_SELECTION**: Present a scenario + 4-5 mutually exclusive options \
-from most aggressive to most passive. ALWAYS include "Take no action" as \
-the final option.
+- **ACTION_SELECTION**: "Which action will Trump take regarding X?" + 4-5 \
+mutually exclusive options from most aggressive to most passive. ALWAYS \
+include "Take no action" as the final option.
+
+## CRITICAL: {leader} PERSONAL ATTRIBUTION REQUIREMENT
+Every question MUST be about a decision that **{leader}** personally makes, \
+directs, or has direct authority over. This is NON-NEGOTIABLE.
+
+✅ GOOD examples (Trump is the decision-maker):
+- "Will Trump impose tariffs on X by Y?"
+- "Will Trump sign an executive order on X?"
+- "Will Trump fire/nominate X?"
+- "Will Trump veto the X bill?"
+- "Which action will Trump take regarding X?"
+
+❌ BAD examples (someone else is the decision-maker — DO NOT GENERATE THESE):
+- "What will the Department of Energy do regarding the SPR?" (agency, not Trump)
+- "Will Congress pass the X bill?" (Congress, not Trump)
+- "Will the Fed raise interest rates?" (Fed, not Trump)
+- "Will the Supreme Court rule on X?" (SCOTUS, not Trump)
+- "Will the stock market reach X?" (market forces, not Trump)
+- "What will NATO do about X?" (foreign institution, not Trump)
+
+Trump's NAME must appear in every question_text. The question must be \
+about HIS personal action, directive, order, nomination, statement, or \
+decision — not about downstream consequences or institutional processes \
+that happen independently of the President.
+
+Attribution evidence from the seed event: {attribution_evidence}
 
 ## ANTI-HINDSIGHT RULES
 - You are on {simulation_date}. Everything after this date is the unknown future.
@@ -153,7 +186,7 @@ Use web_search to:
 
 async def run_seed_agent(
     seed: DecisionSeed,
-    model_name: str = "gemini-3-flash",
+    model_name: str = "gemini-3-pro-preview",
     temperature: float = 0.7,
 ) -> list[Question]:
     """
@@ -183,6 +216,8 @@ async def run_seed_agent(
         domain=seed.domain.value,
         event_description=seed.event_description,
         alternatives=alternatives_text,
+        leader=getattr(seed, '_leader', 'Donald J. Trump'),
+        attribution_evidence=seed.attribution_evidence,
     )
 
     logger.info(

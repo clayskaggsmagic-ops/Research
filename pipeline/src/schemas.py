@@ -179,6 +179,18 @@ class Question(BaseModel):
     resolution_evidence: str | None = Field(
         default=None, description="Cited evidence for the ground truth answer"
     )
+    resolution_derivation: str | None = Field(
+        default=None,
+        description="Bullet-proof argument with ALL links and search queries verbatim (A.21)",
+    )
+    resolution_weaknesses: str | None = Field(
+        default=None,
+        description="Self-critique: 'ONE subtle mistake in your derivation — what would it be?'",
+    )
+    search_queries_used: list[str] = Field(
+        default_factory=list,
+        description="Verbatim search queries used during resolution",
+    )
 
 
 class Prediction(BaseModel):
@@ -212,15 +224,15 @@ class PipelineConfig(BaseModel):
         description="Model for Stages 2-3 (proto-question gen + refinement)",
     )
     verifier_model: str = Field(
-        default="claude-sonnet-4-20250514",
-        description="Model for Stage 4 — MUST be different family from drafter",
+        default="gemini-2.5-flash",
+        description="Model for Stage 4 — MUST be different generation from drafter",
     )
     resolver_model: str = Field(
-        default="gemini-2.5-pro",
+        default="gemini-2.5-flash",
         description="Model for ground truth resolution + difficulty scoring",
     )
     prediction_model: str = Field(
-        default="gemini-2.5-pro",
+        default="gemini-2.5-flash",
         description="Model under test — version-pinned for all predictions",
     )
 

@@ -84,6 +84,15 @@ class ResearchFlags(BaseModel):
         default=False,
         description="True if the question is based on facts that don't exist",
     )
+    not_leader_decision: bool = Field(
+        default=False,
+        description=(
+            "True if this question is NOT about a decision personally made "
+            "by the President. Examples: Fed rate decisions, Congressional "
+            "votes, Supreme Court rulings, market movements, agency actions "
+            "not directed by the President."
+        ),
+    )
     flag_details: str = Field(
         default="",
         description="Explanation of any flags raised",
@@ -156,6 +165,12 @@ You MUST also check whether this question has any of these problems:
 - **Resolution source missing**: Does the proposed way to check the answer \
 actually exist? (e.g., does the agency publish the relevant data?)
 - **Hallucinated facts**: Is the question based on facts that don't exist?
+- **Not a presidential decision**: Is this question about something the \
+President personally decides/directs, or is it about an agency, institution, \
+court, or market force acting independently? If you could remove Trump's \
+name from the question and it would still make sense, FLAG IT. Examples of \
+non-presidential decisions: Fed rate changes, Congressional vote outcomes, \
+Supreme Court rulings, stock market movements, foreign government actions.
 
 If you find ANY of these problems, flag them clearly.
 
@@ -172,7 +187,7 @@ If you find ANY of these problems, flag them clearly.
 
 async def run_research_agent(
     question: Question,
-    model_name: str = "gemini-2.5-flash",
+    model_name: str = "gemini-3-pro-preview",
     temperature: float = 0.4,
 ) -> tuple[str, list[str], str]:
     """
@@ -244,6 +259,8 @@ async def run_research_agent(
             flags.append(f"RESOLUTION_SOURCE_MISSING: {structured.flags.flag_details}")
         if structured.flags.hallucinated_facts:
             flags.append(f"HALLUCINATED_FACTS: {structured.flags.flag_details}")
+        if structured.flags.not_leader_decision:
+            flags.append(f"NOT_LEADER_DECISION: {structured.flags.flag_details}")
 
         logger.info(
             "Question %s: research complete. Quality: %s. Flags: %s",
