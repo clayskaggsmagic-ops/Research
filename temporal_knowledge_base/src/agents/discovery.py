@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 
-DISCOVERY_BATCH_SIZE = 5  # Queries to process per node invocation
+DISCOVERY_BATCH_SIZE = 30  # Queries to process per node invocation
 SEARCH_RESULTS_PER_QUERY = 10
 RATE_LIMIT_DELAY = 1.0  # Seconds between API calls
 

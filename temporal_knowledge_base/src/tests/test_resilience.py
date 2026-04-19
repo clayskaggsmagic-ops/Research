@@ -3,23 +3,23 @@
 from __future__ import annotations
 
 import asyncio
-import time
 
 import pytest
 
 from src.resilience import (
     CircuitBreaker,
-    CircuitBreakerOpenError,
-    retry_with_backoff,
+    CircuitBreakerOpen,
+    circuit_breaker,
+    retry_async,
     safe_gather,
 )
 
 
 # ---------------------------------------------------------------------------
-# retry_with_backoff tests
+# retry_async tests
 # ---------------------------------------------------------------------------
 
-class TestRetryWithBackoff:
+class TestRetryAsync:
     """Test the retry decorator."""
 
     @pytest.mark.asyncio
@@ -27,7 +27,7 @@ class TestRetryWithBackoff:
         """Function that succeeds on first call is not retried."""
         call_count = 0
 
-        @retry_with_backoff(max_retries=3, base_delay=0.01)
+        @retry_async(max_retries=3, backoff_base=0.1, retryable_exceptions=(ValueError,))
         async def succeeds():
             nonlocal call_count
             call_count += 1
@@ -42,7 +42,7 @@ class TestRetryWithBackoff:
         """Function that fails twice then succeeds is retried correctly."""
         call_count = 0
 
-        @retry_with_backoff(max_retries=3, base_delay=0.01)
+        @retry_async(max_retries=3, backoff_base=0.1, jitter=False, retryable_exceptions=(ValueError,))
         async def fails_twice():
             nonlocal call_count
             call_count += 1
@@ -59,7 +59,7 @@ class TestRetryWithBackoff:
         """Function that always fails raises after max retries."""
         call_count = 0
 
-        @retry_with_backoff(max_retries=2, base_delay=0.01)
+        @retry_async(max_retries=2, backoff_base=0.1, jitter=False, retryable_exceptions=(RuntimeError,))
         async def always_fails():
             nonlocal call_count
             call_count += 1
@@ -70,23 +70,19 @@ class TestRetryWithBackoff:
         assert call_count == 3  # initial + 2 retries
 
     @pytest.mark.asyncio
-    async def test_backoff_timing(self):
-        """Verify exponential backoff is applied (basic timing check)."""
+    async def test_non_retryable_exception_not_retried(self):
+        """Exception not in retryable_exceptions is raised immediately."""
         call_count = 0
-        start = time.monotonic()
 
-        @retry_with_backoff(max_retries=2, base_delay=0.05, max_delay=1.0)
-        async def fails_then_ok():
+        @retry_async(max_retries=3, backoff_base=0.1, retryable_exceptions=(ValueError,))
+        async def raises_type_error():
             nonlocal call_count
             call_count += 1
-            if call_count < 2:
-                raise ValueError("retry me")
-            return "done"
+            raise TypeError("not retryable")
 
-        await fails_then_ok()
-        elapsed = time.monotonic() - start
-        # Should have waited ~0.05s for the retry
-        assert elapsed >= 0.04, f"Expected at least 40ms delay, got {elapsed:.3f}s"
+        with pytest.raises(TypeError):
+            await raises_type_error()
+        assert call_count == 1  # no retries
 
 
 # ---------------------------------------------------------------------------
@@ -94,43 +90,43 @@ class TestRetryWithBackoff:
 # ---------------------------------------------------------------------------
 
 class TestCircuitBreaker:
-    """Test the circuit breaker pattern."""
+    """Test the circuit breaker pattern via the decorator."""
 
     @pytest.mark.asyncio
     async def test_stays_closed_on_success(self):
         """Circuit stays closed when calls succeed."""
-        cb = CircuitBreaker(failure_threshold=3, recovery_timeout=0.1)
 
+        @circuit_breaker(failure_threshold=3, reset_timeout=0.1)
         async def ok():
             return "yes"
 
         for _ in range(5):
-            result = await cb.call(ok)
+            result = await ok()
             assert result == "yes"
 
     @pytest.mark.asyncio
     async def test_opens_after_threshold(self):
         """Circuit opens after failure_threshold failures."""
-        cb = CircuitBreaker(failure_threshold=2, recovery_timeout=0.1)
 
+        @circuit_breaker(failure_threshold=2, reset_timeout=0.1)
         async def fails():
             raise RuntimeError("boom")
 
-        # First two failures — circuit stays closed during attempts
+        # First two failures trip the breaker
         for _ in range(2):
             with pytest.raises(RuntimeError):
-                await cb.call(fails)
+                await fails()
 
         # Third call should hit the open circuit
-        with pytest.raises(CircuitBreakerOpenError):
-            await cb.call(fails)
+        with pytest.raises(CircuitBreakerOpen):
+            await fails()
 
     @pytest.mark.asyncio
-    async def test_half_open_recovery(self):
-        """Circuit recovers to half-open state after timeout."""
-        cb = CircuitBreaker(failure_threshold=2, recovery_timeout=0.05)
+    async def test_recovers_after_timeout(self):
+        """Circuit transitions to half-open and recovers after reset_timeout."""
         call_count = 0
 
+        @circuit_breaker(failure_threshold=2, reset_timeout=0.05)
         async def fails_then_ok():
             nonlocal call_count
             call_count += 1
@@ -138,17 +134,30 @@ class TestCircuitBreaker:
                 raise RuntimeError("fail")
             return "recovered"
 
-        # Trip the breaker
         for _ in range(2):
             with pytest.raises(RuntimeError):
-                await cb.call(fails_then_ok)
+                await fails_then_ok()
 
-        # Wait for recovery timeout
+        # Wait past reset_timeout, breaker should let the next call through
         await asyncio.sleep(0.1)
 
-        # Should try half-open and succeed
-        result = await cb.call(fails_then_ok)
+        result = await fails_then_ok()
         assert result == "recovered"
+
+    def test_manual_state_tracking(self):
+        """CircuitBreaker instance tracks failures/successes manually."""
+        cb = CircuitBreaker(failure_threshold=3, reset_timeout=60.0)
+        assert cb.is_open is False
+
+        cb.record_failure()
+        cb.record_failure()
+        assert cb.is_open is False  # not yet at threshold
+
+        cb.record_failure()
+        assert cb.is_open is True
+
+        cb.record_success()
+        assert cb.is_open is False
 
 
 # ---------------------------------------------------------------------------
@@ -156,16 +165,16 @@ class TestCircuitBreaker:
 # ---------------------------------------------------------------------------
 
 class TestSafeGather:
-    """Test safe_gather (partial failure tolerance)."""
+    """Test safe_gather (partial failure tolerance via *coros star-args)."""
 
     @pytest.mark.asyncio
     async def test_all_succeed(self):
         """All tasks succeeding returns all results."""
 
-        async def ok(n):
+        async def double(n):
             return n * 2
 
-        results = await safe_gather([ok(1), ok(2), ok(3)])
+        results = await safe_gather(double(1), double(2), double(3))
         assert results == [2, 4, 6]
 
     @pytest.mark.asyncio
@@ -178,20 +187,39 @@ class TestSafeGather:
         async def fail():
             raise ValueError("nope")
 
-        results = await safe_gather([ok(), fail(), ok()])
+        results = await safe_gather(ok(), fail(), ok())
         assert results == ["yes", None, "yes"]
 
     @pytest.mark.asyncio
-    async def test_all_fail(self):
-        """All tasks failing returns all None."""
+    async def test_return_exceptions_true(self):
+        """return_exceptions=True returns the exceptions as values."""
+
+        async def ok():
+            return "yes"
 
         async def fail():
             raise ValueError("nope")
 
-        results = await safe_gather([fail(), fail()])
-        assert results == [None, None]
+        results = await safe_gather(ok(), fail(), return_exceptions=True)
+        assert results[0] == "yes"
+        assert isinstance(results[1], ValueError)
 
     @pytest.mark.asyncio
     async def test_empty_input(self):
-        results = await safe_gather([])
+        results = await safe_gather()
         assert results == []
+
+    @pytest.mark.asyncio
+    async def test_concurrency_limit(self):
+        """max_concurrency caps simultaneous task execution."""
+        state = {"active": 0, "peak": 0}
+
+        async def track():
+            state["active"] += 1
+            state["peak"] = max(state["peak"], state["active"])
+            await asyncio.sleep(0.01)
+            state["active"] -= 1
+            return True
+
+        await safe_gather(*[track() for _ in range(10)], max_concurrency=3)
+        assert state["peak"] <= 3

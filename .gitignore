@@ -1,0 +1,30 @@
+# Root-level safety net — belt-and-suspenders against committed secrets.
+# Each subproject also has its own .gitignore.
+
+# Never commit environment files anywhere in the tree
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Credentials / keys (defense in depth)
+*.pem
+*.key
+secrets/
+.secrets/
+credentials.json
+service-account*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp

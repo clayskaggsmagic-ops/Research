@@ -30,10 +30,10 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 
-EXTRACTION_BATCH_SIZE = 10  # Candidates to process per node invocation
+EXTRACTION_BATCH_SIZE = 60  # Candidates to process per node invocation
 FETCH_TIMEOUT = 15.0  # Seconds timeout for HTTP requests
 MIN_ARTICLE_WORDS = 100  # Minimum word count to not be a stub
-EXTRACTION_CONCURRENCY = 8  # Max concurrent fetch+LLM extractions
+EXTRACTION_CONCURRENCY = 15  # Max concurrent fetch+LLM extractions
 
 
 # ---------------------------------------------------------------------------

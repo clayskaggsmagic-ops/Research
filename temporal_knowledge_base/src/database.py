@@ -162,9 +162,14 @@ async def retrieve_events(
     if topic_filter:
         stmt = stmt.where(EventRecordRow.topics.overlap(topic_filter))
 
-    # Order by vector similarity (cosine distance via pgvector <=> operator)
+    # Order by vector similarity (cosine distance via pgvector <=> operator).
+    # Confidence nudges ranking: effective_distance = distance * (2 - confidence).
+    # High-confidence records (conf=1) get multiplier 1 (no penalty);
+    # low-confidence records (conf=0) get multiplier 2 (demoted).
     embedding_vec = np.array(query_embedding, dtype=np.float32)
-    stmt = stmt.order_by(EventRecordRow.embedding.cosine_distance(embedding_vec))
+    distance_expr = EventRecordRow.embedding.cosine_distance(embedding_vec)
+    stmt = stmt.where(distance_expr <= settings.similarity_threshold)
+    stmt = stmt.order_by(distance_expr * (2 - EventRecordRow.confidence))
     stmt = stmt.limit(top_k)
 
     result = await session.execute(stmt)
