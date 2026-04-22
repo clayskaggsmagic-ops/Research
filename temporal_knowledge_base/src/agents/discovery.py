@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 DISCOVERY_BATCH_SIZE = 30  # Queries to process per node invocation
+DISCOVERY_BACKPRESSURE_LIMIT = 400  # Skip discovery if raw_candidates queue exceeds this
 SEARCH_RESULTS_PER_QUERY = 10
 RATE_LIMIT_DELAY = 1.0  # Seconds between API calls
 
@@ -384,6 +385,15 @@ async def discovery_node(state: SwarmState) -> SwarmState:
     """
     if not state.research_plan:
         logger.info("Discovery: no queries in research plan — nothing to do")
+        return state
+
+    # Backpressure: if extraction hasn't drained the queue, don't add more
+    if len(state.raw_candidates) > DISCOVERY_BACKPRESSURE_LIMIT:
+        logger.info(
+            f"Discovery: SKIPPING — candidate queue full "
+            f"({len(state.raw_candidates)} > {DISCOVERY_BACKPRESSURE_LIMIT}). "
+            f"Letting extraction drain before searching more."
+        )
         return state
 
     # Pop the next batch

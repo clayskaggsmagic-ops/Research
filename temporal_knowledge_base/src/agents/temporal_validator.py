@@ -16,6 +16,7 @@ A wrong date IS data leakage. ZERO tolerance.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections import Counter
 from datetime import date, timedelta
@@ -39,6 +40,8 @@ def _get_llm() -> ChatGoogleGenerativeAI:
         model=settings.research_model,
         google_api_key=settings.google_api_key,
         temperature=0.0,  # Deterministic — this is a fact-checking task
+        timeout=120,
+        max_retries=2,
     )
 
 
@@ -346,13 +349,20 @@ async def temporal_validator_node(state: SwarmState) -> SwarmState:
     passed_count = 0
     quarantined_count = 0
 
-    for record in records_to_validate:
-        passed, updated_record = await validate_record(
-            record=record,
-            all_records=records_to_validate,
-            collection_start=state.collection_start,
-        )
+    # Validate records in parallel — L3 is an LLM call so this is the key speedup
+    sem = asyncio.Semaphore(10)
 
+    async def _validate_with_sem(record: EventRecord) -> tuple[bool, EventRecord]:
+        async with sem:
+            return await validate_record(
+                record=record,
+                all_records=records_to_validate,
+                collection_start=state.collection_start,
+            )
+
+    outcomes = await asyncio.gather(*[_validate_with_sem(r) for r in records_to_validate])
+
+    for passed, updated_record in outcomes:
         if passed:
             state.validated_records.append(updated_record)
             passed_count += 1

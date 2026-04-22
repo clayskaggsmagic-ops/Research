@@ -12,6 +12,7 @@ It does NOT validate temporal integrity — that's the Temporal Validator's job.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from collections import defaultdict
@@ -43,6 +44,8 @@ def _get_llm() -> ChatGoogleGenerativeAI:
         model=settings.research_model,
         google_api_key=settings.google_api_key,
         temperature=0.1,
+        timeout=120,
+        max_retries=2,
     )
 
 
@@ -490,41 +493,44 @@ async def cleaning_node(state: SwarmState) -> SwarmState:
     # --- Step 1: Cluster ---
     clusters = cluster_extractions(successful)
 
-    # --- Step 2: Merge + synthesize + score ---
+    # --- Step 2-4: Merge + bias-strip + normalize, in parallel across clusters ---
+    sem = asyncio.Semaphore(10)  # Cap concurrent LLM calls to avoid Gemini rate limits
+
+    async def _process_cluster(cluster: list[ExtractionResult]) -> tuple[EventRecord | None, str | None]:
+        async with sem:
+            try:
+                record = await merge_cluster(cluster)
+                record.summary = await bias_strip(record.summary)
+                record.topics = normalize_topics(record.topics)
+                record.actors = [normalize_actor_name(a) for a in record.actors]
+
+                if state.subject_name not in record.actors:
+                    record.actors.insert(0, state.subject_name)
+
+                if not validate_date_plausibility(
+                    record.event_date,
+                    state.collection_start,
+                    state.collection_end,
+                ):
+                    record.date_confidence = DateConfidence.UNCERTAIN
+                    logger.warning(
+                        f"Date {record.event_date} outside collection window "
+                        f"for '{record.headline}' — flagged uncertain"
+                    )
+
+                return record, None
+            except Exception as e:
+                return None, f"Failed to merge cluster (headlines: {[r.headline for r in cluster]}): {e}"
+
+    merge_results = await asyncio.gather(*[_process_cluster(c) for c in clusters])
+
     new_records: list[EventRecord] = []
-    for cluster in clusters:
-        try:
-            record = await merge_cluster(cluster)
-
-            # --- Step 3: Bias-strip the summary ---
-            record.summary = await bias_strip(record.summary)
-
-            # --- Step 4: Normalize ---
-            record.topics = normalize_topics(record.topics)
-            record.actors = [normalize_actor_name(a) for a in record.actors]
-
-            # Add the subject as an actor if not present
-            if state.subject_name not in record.actors:
-                record.actors.insert(0, state.subject_name)
-
-            # Validate date plausibility
-            if not validate_date_plausibility(
-                record.event_date,
-                state.collection_start,
-                state.collection_end,
-            ):
-                record.date_confidence = DateConfidence.UNCERTAIN
-                logger.warning(
-                    f"Date {record.event_date} outside collection window "
-                    f"for '{record.headline}' — flagged uncertain"
-                )
-
+    for record, error in merge_results:
+        if error:
+            logger.error(error)
+            state.errors.append(error)
+        elif record is not None:
             new_records.append(record)
-
-        except Exception as e:
-            error_msg = f"Failed to merge cluster (headlines: {[r.headline for r in cluster]}): {e}"
-            logger.error(error_msg)
-            state.errors.append(error_msg)
 
     # Clear processed extractions, add cleaned records
     state.extraction_results = []

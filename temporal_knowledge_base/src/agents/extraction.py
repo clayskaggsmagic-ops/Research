@@ -30,10 +30,12 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 
-EXTRACTION_BATCH_SIZE = 60  # Candidates to process per node invocation
+EXTRACTION_CHUNK_SIZE = 60  # Candidates per concurrent chunk
+EXTRACTION_MAX_CHUNKS_PER_STEP = 6  # Up to 6 chunks per node invocation (= 360 candidates max)
+EXTRACTION_DRAIN_WATERMARK = 80  # Stop draining when queue falls below this
 FETCH_TIMEOUT = 15.0  # Seconds timeout for HTTP requests
 MIN_ARTICLE_WORDS = 100  # Minimum word count to not be a stub
-EXTRACTION_CONCURRENCY = 15  # Max concurrent fetch+LLM extractions
+EXTRACTION_CONCURRENCY = 15  # Max concurrent fetch+LLM extractions per chunk
 
 
 # ---------------------------------------------------------------------------
@@ -246,6 +248,8 @@ def _get_llm() -> ChatGoogleGenerativeAI:
         model=settings.research_model,
         google_api_key=settings.google_api_key,
         temperature=0.1,  # Very low — we want deterministic factual extraction
+        timeout=120,
+        max_retries=2,
     )
 
 
@@ -450,46 +454,62 @@ async def extraction_node(state: SwarmState) -> SwarmState:
         logger.info("Extraction: no raw candidates to process")
         return state
 
-    # Pop the next batch
-    batch_size = min(EXTRACTION_BATCH_SIZE, len(state.raw_candidates))
-    batch = state.raw_candidates[:batch_size]
-    state.raw_candidates = state.raw_candidates[batch_size:]
-
     logger.info(
-        f"Extraction: processing {len(batch)} candidates CONCURRENTLY "
-        f"(max {EXTRACTION_CONCURRENCY}, {len(state.raw_candidates)} remaining)"
+        f"Extraction: draining candidate queue ({len(state.raw_candidates)} pending, "
+        f"up to {EXTRACTION_MAX_CHUNKS_PER_STEP} chunks × {EXTRACTION_CHUNK_SIZE})"
     )
 
     sem = asyncio.Semaphore(EXTRACTION_CONCURRENCY)
+    total_success = 0
+    total_fail = 0
 
-    # --- Parallel fetch + extract ---
-    tasks = [_extract_single_candidate(c, sem) for c in batch]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+    for chunk_idx in range(EXTRACTION_MAX_CHUNKS_PER_STEP):
+        if not state.raw_candidates:
+            break
 
-    success_count = 0
-    fail_count = 0
+        chunk_size = min(EXTRACTION_CHUNK_SIZE, len(state.raw_candidates))
+        chunk = state.raw_candidates[:chunk_size]
+        state.raw_candidates = state.raw_candidates[chunk_size:]
 
-    for outcome in results:
-        if isinstance(outcome, BaseException):
-            fail_count += 1
-            state.errors.append(f"Extraction task exception: {outcome}")
-            continue
+        logger.info(
+            f"  Chunk {chunk_idx + 1}/{EXTRACTION_MAX_CHUNKS_PER_STEP}: "
+            f"{len(chunk)} candidates (remaining after: {len(state.raw_candidates)})"
+        )
 
-        result, error = outcome
-        state.extraction_results.append(result)
+        # --- Parallel fetch + extract for this chunk ---
+        tasks = [_extract_single_candidate(c, sem) for c in chunk]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        if result.extraction_success:
-            success_count += 1
-        else:
-            fail_count += 1
+        for outcome in results:
+            if isinstance(outcome, BaseException):
+                total_fail += 1
+                state.errors.append(f"Extraction task exception: {outcome}")
+                continue
 
-        if error:
-            state.errors.append(error)
+            result, error = outcome
+            state.extraction_results.append(result)
 
-    rate = (success_count / (success_count + fail_count) * 100) if (success_count + fail_count) > 0 else 0
+            if result.extraction_success:
+                total_success += 1
+            else:
+                total_fail += 1
+
+            if error:
+                state.errors.append(error)
+
+        # Stop draining once queue is below watermark — let downstream catch up
+        if len(state.raw_candidates) < EXTRACTION_DRAIN_WATERMARK:
+            logger.info(
+                f"  Queue below watermark ({len(state.raw_candidates)} < {EXTRACTION_DRAIN_WATERMARK}) "
+                f"— stopping drain"
+            )
+            break
+
+    rate = (total_success / (total_success + total_fail) * 100) if (total_success + total_fail) > 0 else 0
     logger.info(
-        f"Extraction complete: {success_count} succeeded, {fail_count} failed "
-        f"({rate:.0f}% success rate, total results: {len(state.extraction_results)})"
+        f"Extraction complete: {total_success} succeeded, {total_fail} failed "
+        f"({rate:.0f}% success rate, total results: {len(state.extraction_results)}, "
+        f"queue remaining: {len(state.raw_candidates)})"
     )
 
     return state
