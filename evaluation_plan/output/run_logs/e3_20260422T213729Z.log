@@ -1,0 +1,66 @@
+[e3] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl dry_run=False
+[e3] dispatching 378 calls across 8 worker threads
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/langchain_google_genai/chat_models.py:47: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  from google.generativeai.caching import CachedContent  # type: ignore[import]
+[e3]   10/378 done (0.5 calls/s)
+[e3]   20/378 done (0.7 calls/s)
+[e3]   30/378 done (0.7 calls/s)
+[e3]   40/378 done (0.7 calls/s)
+[e3]   50/378 done (0.7 calls/s)
+[e3]   60/378 done (0.8 calls/s)
+[e3]   70/378 done (0.8 calls/s)
+[e3]   80/378 done (0.8 calls/s)
+[e3]   90/378 done (0.8 calls/s)
+[e3]   100/378 done (0.8 calls/s)
+[e3]   110/378 done (0.8 calls/s)
+[e3]   120/378 done (0.8 calls/s)
+[e3]   130/378 done (0.9 calls/s)
+[e3]   140/378 done (0.8 calls/s)
+[e3]   150/378 done (0.9 calls/s)
+[e3]   160/378 done (0.8 calls/s)
+[e3]   170/378 done (0.8 calls/s)
+[e3]   180/378 done (0.8 calls/s)
+[e3]   190/378 done (0.9 calls/s)
+[e3]   200/378 done (0.8 calls/s)
+[e3]   210/378 done (0.8 calls/s)
+[e3]   220/378 done (0.8 calls/s)
+[e3]   230/378 done (0.8 calls/s)
+[e3]   240/378 done (0.8 calls/s)
+[e3]   250/378 done (0.8 calls/s)
+[e3]   260/378 done (0.8 calls/s)
+[e3]   270/378 done (0.8 calls/s)
+[e3]   280/378 done (0.8 calls/s)
+[e3]   290/378 done (0.8 calls/s)
+[e3]   300/378 done (0.8 calls/s)
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised DeadlineExceeded: 504 Deadline Exceeded.
+[e3]   310/378 done (0.8 calls/s)
+[e3]   320/378 done (0.8 calls/s)
+[e3]   330/378 done (0.8 calls/s)
+[e3]   340/378 done (0.7 calls/s)
+[e3]   350/378 done (0.7 calls/s)
+[e3]   360/378 done (0.7 calls/s)
+[e3]   370/378 done (0.7 calls/s)
+[e3]   378/378 done (0.7 calls/s)
+[e3] done. calls=378 skipped=137 elapsed=539.3s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl

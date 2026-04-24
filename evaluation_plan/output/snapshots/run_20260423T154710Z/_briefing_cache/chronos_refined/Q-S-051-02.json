@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['Donald Trump'], topics=['continuing resolution', 'government funding', 'fiscal year 2025', 'DOGE provisions', 'veto', 'appropriations'].",
+  "hash": "06e02e231b4de0e2",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

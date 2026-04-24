@@ -1,0 +1,61 @@
+===============================================================
+AUTONOMOUS EXPERIMENT RUN
+started: Thu Apr 23 15:23:19 UTC 2026
+host:    Clays-MacBook-Pro.local
+pwd:     /Users/clayskaggs/Developer/Research
+pid:     13091
+log:     evaluation_plan/output/run_logs/run_20260423T152319Z.log
+===============================================================
+
+--- [e3] start Thu Apr 23 15:23:19 UTC 2026 ---
+--- [e3] end Thu Apr 23 15:23:19 UTC 2026 rc=0 ---
+  [e3] [e3] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl dry_run=False
+  [e3] [e3] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl
+
+--- [e5] start Thu Apr 23 15:23:19 UTC 2026 ---
+--- [e5] end Thu Apr 23 15:40:26 UTC 2026 rc=0 ---
+  [e5] [e5]   190/196 done (0.3 calls/s)
+  [e5] [e5]   196/196 done (0.3 calls/s)
+  [e5] [e5] done. calls=196 skipped=319 elapsed=618.5s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl
+
+--- [e1] start Thu Apr 23 15:40:26 UTC 2026 ---
+--- [e1] end Thu Apr 23 15:40:27 UTC 2026 rc=0 ---
+  [e1] [e1] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1/predictions.jsonl dry_run=False
+  [e1] [e1] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1/predictions.jsonl
+
+--- [e4] start Thu Apr 23 15:40:27 UTC 2026 ---
+--- [e4] end Thu Apr 23 15:40:27 UTC 2026 rc=0 ---
+  [e4] [e4] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e4/predictions.jsonl dry_run=False
+  [e4] [e4] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e4/predictions.jsonl
+
+--- [e1p] start Thu Apr 23 15:40:27 UTC 2026 ---
+--- [e1p] end Thu Apr 23 15:40:28 UTC 2026 rc=0 ---
+  [e1p] [e1p] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1p/predictions.jsonl dry_run=False
+  [e1p] [e1p] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1p/predictions.jsonl
+
+--- [e2] start Thu Apr 23 15:40:28 UTC 2026 ---
+--- [e2] end Thu Apr 23 15:40:29 UTC 2026 rc=0 ---
+  [e2] [e2] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl dry_run=False
+  [e2] [e2] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl
+
+===============================================================
+ALL EXPERIMENTS DONE
+finished: Thu Apr 23 15:40:29 UTC 2026
+===============================================================
+-rw-r--r--@ 1 clayskaggs  staff   773378 Apr 23 10:19 pipeline/output/predictions/e1/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   759361 Apr 23 10:58 pipeline/output/predictions/e1p/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   748368 Apr 23 11:22 pipeline/output/predictions/e2/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   729709 Apr 22 17:57 pipeline/output/predictions/e3/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff  1017963 Apr 23 10:43 pipeline/output/predictions/e4/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   764771 Apr 23 11:40 pipeline/output/predictions/e5/predictions.jsonl
+Record counts:
+  e1:      515 records (0
+0 errors)
+  e1p:      515 records (0
+0 errors)
+  e2:      515 records (0
+0 errors)
+  e3:      515 records (0
+0 errors)
+  e4:      515 records (1 errors)
+  e5:      515 records (123 errors)

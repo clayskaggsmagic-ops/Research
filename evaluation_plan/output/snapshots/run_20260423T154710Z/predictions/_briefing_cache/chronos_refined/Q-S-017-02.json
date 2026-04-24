@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['Environmental Protection Agency', 'Affordable Clean Energy rule'], topics=['epa', 'ace rule', 'federal register', 'rulemaking', 'climate policy', 'greenhouse gas emissions'].",
+  "hash": "a13063363d5c9f45",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

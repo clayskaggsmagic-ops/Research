@@ -1,0 +1,55 @@
+===============================================================
+AUTONOMOUS EXPERIMENT RUN
+started: Thu Apr 23 17:37:10 UTC 2026
+host:    Clays-MacBook-Pro.local
+pwd:     /Users/clayskaggs/Developer/Research
+pid:     20729
+log:     evaluation_plan/output/run_logs/run_20260423T173710Z.log
+===============================================================
+
+--- [e3] start Thu Apr 23 17:37:10 UTC 2026 ---
+--- [e3] end Thu Apr 23 17:47:33 UTC 2026 rc=0 ---
+  [e3] [e3] dispatching 7 calls across 7 worker threads
+  [e3] [e3]   7/7 done (1.0 calls/s)
+  [e3] [e3] done. calls=7 skipped=508 elapsed=7.3s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl
+
+--- [e5] start Thu Apr 23 17:47:33 UTC 2026 ---
+--- [e5] end Thu Apr 23 18:32:19 UTC 2026 rc=143 ---
+  [e5] [e5] model=gemini-2.0-flash-lite questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl dry_run=False
+[e5] FAILED (rc=143) — check evaluation_plan/output/run_logs/e5_20260423T173710Z.log
+
+--- [e1] start Thu Apr 23 18:32:19 UTC 2026 ---
+--- [e1] end Thu Apr 23 18:32:19 UTC 2026 rc=1 ---
+  [e1]   File "/Users/clayskaggs/Developer/Research/temporal_knowledge_base/src/config.py", line 9, in <module>
+  [e1]     from pydantic_settings import BaseSettings
+  [e1] ModuleNotFoundError: No module named 'pydantic_settings'
+[e1] FAILED (rc=1) — check evaluation_plan/output/run_logs/e1_20260423T173710Z.log
+
+--- [e4] start Thu Apr 23 18:32:19 UTC 2026 ---
+--- [e4] end Thu Apr 23 18:32:19 UTC 2026 rc=1 ---
+  [e4]   File "/Users/clayskaggs/Developer/Research/temporal_knowledge_base/src/config.py", line 9, in <module>
+  [e4]     from pydantic_settings import BaseSettings
+  [e4] ModuleNotFoundError: No module named 'pydantic_settings'
+[e4] FAILED (rc=1) — check evaluation_plan/output/run_logs/e4_20260423T173710Z.log
+
+--- [e1p] start Thu Apr 23 18:32:19 UTC 2026 ---
+--- [e1p] end Thu Apr 23 18:32:19 UTC 2026 rc=1 ---
+  [e1p]   File "/Users/clayskaggs/Developer/Research/temporal_knowledge_base/src/config.py", line 9, in <module>
+  [e1p]     from pydantic_settings import BaseSettings
+  [e1p] ModuleNotFoundError: No module named 'pydantic_settings'
+[e1p] FAILED (rc=1) — check evaluation_plan/output/run_logs/e1p_20260423T173710Z.log
+
+--- [e2] start Thu Apr 23 18:32:19 UTC 2026 ---
+--- [e2] end Thu Apr 23 18:32:19 UTC 2026 rc=1 ---
+  [e2]   File "/Users/clayskaggs/Developer/Research/temporal_knowledge_base/src/config.py", line 9, in <module>
+  [e2]     from pydantic_settings import BaseSettings
+  [e2] ModuleNotFoundError: No module named 'pydantic_settings'
+[e2] FAILED (rc=1) — check evaluation_plan/output/run_logs/e2_20260423T173710Z.log
+
+===============================================================
+ALL EXPERIMENTS DONE
+finished: Thu Apr 23 18:32:19 UTC 2026
+===============================================================
+-rw-r--r--@ 1 clayskaggs  staff  624975 Apr 23 13:47 pipeline/output/predictions/e3/predictions.jsonl
+Record counts:
+  e3:      515 records (7 errors)

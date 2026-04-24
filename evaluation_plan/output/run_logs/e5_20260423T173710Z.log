@@ -1,0 +1,1 @@
+[e5] model=gemini-2.0-flash-lite questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl dry_run=False

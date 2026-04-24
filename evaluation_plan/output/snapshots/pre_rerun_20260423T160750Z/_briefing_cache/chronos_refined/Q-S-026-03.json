@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['U.S. District Court', 'U.S. Court of Appeals', 'U.S. Supreme Court', 'President of the United States', 'Department of Homeland Security', 'Department of Justice'], topics=['asylum policy', 'immigration law', 'executive orders', 'court injunctions', 'legal challenges'].",
+  "hash": "08aef8cb8cf57112",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

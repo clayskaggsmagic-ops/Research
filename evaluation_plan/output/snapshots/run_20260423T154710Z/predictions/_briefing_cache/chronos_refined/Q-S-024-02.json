@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['ByteDance', 'TikTok', 'U.S. Government', 'Trump Administration', 'CFIUS'], topics=['tiktok', 'divestiture', 'foreign adversary controlled applications act', 'national security', 'executive order', 'congressional action'].",
+  "hash": "d03c470969435a58",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

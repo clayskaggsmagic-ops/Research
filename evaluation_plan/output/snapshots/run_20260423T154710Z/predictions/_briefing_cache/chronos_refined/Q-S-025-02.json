@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['President of the United States', 'Department of Commerce', 'U.S. House of Representatives', 'U.S. Senate'], topics=['artificial intelligence', 'executive order', 'deregulation', 'AI governance', 'legislation', 'presidential commission', 'federal framework', 'preemption'].",
+  "hash": "f550860e70ebff6f",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

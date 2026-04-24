@@ -3,7 +3,7 @@
 **Clay Skaggs¹**
 ¹Massachusetts Institute of Technology
 Correspondence: clayskaggsmagic@gmail.com
-Draft of April 19, 2026
+Draft of April 23, 2026 (results included)
 
 ---
 
@@ -13,7 +13,9 @@ Can large language models (LLMs), when conditioned on the identity of a specific
 
 We present CHRONOS, a framework that couples four contributions: (i) a SQL-enforced temporal knowledge base that prevents data leakage at the database level rather than through prompt instructions, with a single parameter supporting any LLM training cutoff from the same underlying corpus; (ii) an autonomous multi-agent research swarm (coordinator, discovery, extraction, cleaning, temporal validation, indexing, coverage-audit) that constructs the knowledge base without human intervention and iterates to fill coverage gaps; (iii) a four-layer date-validation protocol with a quarantine system that refuses to admit any event whose date cannot be corroborated, on the principle that a wrong date constitutes leakage; and (iv) a five-stage automated question generation pipeline adapted from Bosse et al. (2026) producing 115 pre-registered forecasting questions about the decisions of Donald J. Trump, 47th President of the United States, across seven decision domains.
 
-Evaluation comprises two complementary retroactive protocols: binary probability forecasting scored with Brier and log-loss under temperature-scaled calibration (Guo et al., 2017), and multiple-choice action selection in the style of Katz et al. (2017). Our principal experimental manipulation is a two-way contrast between a **persona** system prompt ("You are Donald Trump") and a leader-neutral **analyst** system prompt with identical retrieval context. This contrast tests whether identity-assertion framing itself contributes predictive signal — distinct from retrieval, from careful forecasting habits, and from the model's parametric knowledge of the leader. This paper presents the problem formulation, system architecture, experimental design, and methodology; experimental results are the subject of a companion report. We pre-register the 115-question manifest, the six planned experimental conditions, and the statistical tests before any predictions are solicited from an evaluated model.
+Evaluation comprises two complementary retroactive protocols: binary probability forecasting scored with Brier score, and multiple-choice action selection in the style of Katz et al. (2017). Our principal experimental manipulation is a two-way contrast between a **persona** system prompt ("You are Donald Trump") and a leader-neutral **analyst** system prompt with identical retrieval context. This contrast tests whether identity-assertion framing itself contributes predictive signal — distinct from retrieval, from careful forecasting habits, and from the model's parametric knowledge of the leader.
+
+We report results from a six-condition evaluation on 103 resolvable questions × 5 samples per question × 6 conditions (3,090 predictions total) using Gemini 2.5 Flash as the evaluated model. **Across every pre-registered paired contrast — persona vs. matched-retrieval analyst, persona with briefing vs. persona without, broad vs. refined retrieval, broad vs. compressed retrieval — no difference reached statistical significance at the conventional α = 0.05 threshold under paired sign tests with sample-size-appropriate bootstrap confidence intervals.** The primary pre-registered contrast — persona vs. analyst with matched CHRONOS retrieval — produced a mean Brier difference of +0.028 (persona worse; 95% bootstrap CI [-0.013, +0.071]; two-sided sign test p = 0.59), in the *opposite* direction from the persona-helps hypothesis. The lowest raw mean Brier was obtained by the Analyst × live web search condition (0.44; 95% CI [0.34, 0.54]), which also suffered 23.9% attrition from API timeouts and malformed outputs — a genuine characteristic of the condition, not a sampling accident. The direction of effects and the tight clustering of Brier means across the four persona conditions (range: 0.51–0.54) is consistent with the strong null: identity-assertion framing and curated retrieval did not, in this evaluation, measurably improve forecasting of Donald Trump's real-world decisions over a careful-analyst baseline with matched context. We discuss the result honestly, including its implications for the feasibility of leader-as-persona forecasting, the interpretation of partial E4 attrition, and the constraints imposed by a single-model family, modest sample size, and mid-tier model evaluation.
 
 ---
 
@@ -318,17 +320,20 @@ The output schema is identical (JSON with `probability` and `reasoning`). We tre
 
 ### 5.3 Experimental Protocols
 
-We run five planned experimental conditions, labeled E1 through E4 plus an E1′ retrieval-volume control, designed to decompose the contributions of persona framing, retrieval, and retrieval-curation. Each condition is run at temperature T > 0 with 10 samples per question; reported metrics aggregate across samples unless otherwise noted.
+We run six experimental conditions, labeled E1 through E4 plus an E1′ retrieval-volume control and an E2′ retrieval-quality control, designed to decompose the contributions of persona framing, retrieval, and retrieval-curation. Each condition is run at temperature T = 1.0; reported metrics aggregate across samples unless otherwise noted.
 
 | ID    | Condition                                        | System Prompt       | CHRONOS Retrieval | Purpose                                   |
 | ----- | ------------------------------------------------ | ------------------- | ----------------- | ----------------------------------------- |
 | E1    | Persona + retrieval (main)                       | "You are Trump"     | Broad top-15      | Flagship result                           |
 | E1′   | Persona + compressed retrieval                   | "You are Trump"     | Top-8             | Isolates context compression from curation|
+| E2′   | Persona + refined retrieval *(post-hoc)*         | "You are Trump"     | 2-stage refined   | Tests retrieval curation at lower token cost |
 | E2    | Persona without retrieval                        | "You are Trump"     | None              | Isolates persona parametric knowledge     |
 | E3    | Non-persona + retrieval                          | "Careful analyst"   | Broad top-15      | Persona-framing control for E1            |
 | E4    | Non-persona + web search                         | "Careful analyst"   | Live web search   | Answerability gate                        |
 
 E1 is our main condition. E2 tests what the persona alone can do with only its training-data knowledge. E3 is the persona-framing control: same retrieval as E1, same question, same output schema, differing only in the system prompt's identity framing. The **E1 − E3** contrast is the primary, pre-registered test of our central research question — whether identity-assertion framing unlocks predictive signal that a leader-neutral analyst framing does not. E1′ tests whether any persona effect in E1 is driven by retrieval volume rather than retrieval content. E4 is an answerability gate: if a non-persona analyst with live web search cannot resolve the questions well, the question set is faulty.
+
+**E2′ note.** E2′ was added to the protocol after pre-registration, as a cost-quality ablation motivated by the observation that E1's broad top-15 briefing consumed ~70K input tokens per prediction. E2′ applies a two-stage retrieval pipeline — LLM-driven query expansion followed by over-retrieval (top-40 candidates) and LLM rerank (keep ~12 most relevant) — to produce a briefing approximately one-sixth the size of E1's. Because E2′ was added post-registration it is reported as a secondary condition and is *not* included in the primary pre-registered contrast.
 
 #### 5.3.1 Experiment 1: Binary Probability Forecasting
 
@@ -443,9 +448,159 @@ Ground-truth resolution of the 115 questions (Pass A + Pass B + adjudication) is
 
 ---
 
-## 8. Results (Forthcoming)
+## 8. Results
 
-Experimental results will be reported in a companion paper. The pre-registered manifest, protocol, and statistical tests described in Sections 5 and 7 fix the evaluation space before any prediction is elicited. The companion paper will report: (i) per-condition aggregate Brier, log-loss, and ECE, raw and temperature-scaled; (ii) per-domain and per-difficulty stratified results; (iii) the primary E1 vs. E3 contrast with effect size and multiple-comparison-corrected p-value; (iv) Experiment 2 top-1, top-2, and rank-correlation results; (v) the planned ablations of Section 7.5; and (vi) qualitative failure-mode analysis with emphasis on escalation bias (Payne et al., 2024) and persona-collapse modes (Bisbee et al., 2024).
+### 8.1 Deviations from the Pre-Registered Plan
+
+We report three deviations from the plan of Section 7, each of which we describe here before any results, so the reader can weigh them.
+
+1. **Evaluated model.** The pre-registered primary evaluated model was Claude Opus 4.7. Due to a hard budget ceiling on the present run we instead evaluated **Gemini 2.5 Flash** (`gemini-2.5-flash`). This is a mid-tier cost-optimized model rather than a frontier reasoner. Any null result reported below is accordingly a null result *on Gemini 2.5 Flash*, not on all frontier LLMs. A secondary evaluation on Opus 4.7 remains a planned robustness check.
+2. **Samples per question.** The pre-registered sample count was N = 10 per (condition, question). We ran **N = 5**, also for budget reasons. This reduces within-question variance estimation precision by √2 but does not affect the unbiasedness of per-question Brier estimates.
+3. **Sixth condition (E2′).** The refined-retrieval condition E2′ was added after pre-registration as a cost-quality ablation. We report it alongside the pre-registered conditions but exclude it from the primary contrast.
+
+The question manifest and resolutions were frozen before any predictions were elicited. All 3,090 predictions were written to append-only JSONL with per-record prompt hash, briefing hash, model ID, and timestamps, and are archived in the snapshot `evaluation_plan/output/snapshots/run_20260423T154710Z/`.
+
+### 8.2 Question Set and Attrition
+
+Of the 115 pre-registered questions, **103 were resolvable** by the two-pass resolution protocol within the evaluation window (12 questions did not yet have a ground-truth outcome determinable from their specified document class). Resolutions were locked in `pipeline/output/resolutions/resolutions.json` before scoring.
+
+Record counts per condition (target: 515 = 103 questions × 5 samples):
+
+| Cond.  | Description                         | Records | Valid | Errors | Input tokens | Output tokens |
+| ------ | ----------------------------------- | ------: | ----: | -----: | -----------: | ------------: |
+| E1     | Persona × CHRONOS broad-15          |     515 |   515 |      0 |   10,317,240 |        73,010 |
+| E1′    | Persona × CHRONOS broad-8           |     515 |   515 |      0 |    6,208,970 |        71,542 |
+| E2′    | Persona × CHRONOS refined           |     515 |   515 |      0 |    1,252,595 |        70,956 |
+| E2     | Persona × no retrieval              |     515 |   515 |      0 |      659,050 |        69,389 |
+| E3     | Analyst × CHRONOS broad-15          |     515 |   514 |      1 |   11,373,489 |        99,678 |
+| E4     | Analyst × live web search (Tavily)  |     515 |   392 |    123 |    2,033,852 |        81,285 |
+
+Five of the six conditions completed with zero or one errors. E4 (live web search) produced **123 invalid records (23.9%)** — 92 Gemini `504 Deadline Exceeded` timeouts on long Tavily-augmented contexts and 31 pydantic validation failures arising from Gemini returning all-zero probability vectors on multiple-choice questions. These are genuine characteristics of the E4 condition (long noisy web-retrieved context appears to destabilize Gemini 2.5 Flash's structured-output behavior), not transient infrastructure failures: when we verified DNS health and rechecked mid-run, the errors continued to appear on specific questions. We accordingly report E4 on its 88-question subset where at least one sample succeeded and flag the attrition prominently.
+
+Fifteen questions have zero valid E4 samples. Scoring all other conditions on *just those 15 questions* yields mean Brier within ±0.03 of their global mean (E1: +0.034; E2: −0.012; E3: −0.013), so the E4-missing set is not systematically easy or hard for the other conditions — the survivorship-bias contamination of E4's apparent advantage is small but nonzero. For fair comparisons we restrict all cross-condition tests to the **88 questions for which every condition has at least one valid sample**.
+
+### 8.3 Primary Metric: Mean Brier Score (Common 88 Questions)
+
+Per-question Brier is computed as the mean over surviving samples for that (condition, question); per-condition aggregate is the mean over the 88 common questions. Binary Brier ∈ [0, 1]; multiclass Brier (unnormalized, 3–5 option action questions) ∈ [0, 2]; the mix in the common subset is 50 binary and 38 action questions. 95% bootstrap confidence intervals are from 10,000 paired resamples (seed 42).
+
+| Cond. | Description                 | Mean Brier | 95% CI           | Mean p(correct) |
+| ----- | --------------------------- | ---------: | ---------------- | --------------: |
+| E1    | Persona × CHRONOS broad-15  |     0.5114 | [0.4163, 0.6093] |          0.4669 |
+| E1′   | Persona × CHRONOS broad-8   |     0.5332 | [0.4379, 0.6331] |          0.4497 |
+| E2′   | Persona × CHRONOS refined   |     0.5208 | [0.4280, 0.6178] |          0.4579 |
+| E2    | Persona × no retrieval      |     0.5377 | [0.4449, 0.6336] |          0.4423 |
+| E3    | Analyst × CHRONOS broad-15  |     0.4830 | [0.4007, 0.5702] |          0.4681 |
+| E4    | Analyst × web search        | **0.4409** | [0.3430, 0.5427] |      **0.5750** |
+
+All six confidence intervals overlap. The separation between the nominal best (E4, 0.441) and nominal worst (E2, 0.538) is ~0.10 in Brier units on a multiclass scale that runs to 2.0 — small relative to within-condition CI widths (~0.20 each).
+
+### 8.4 Pre-Registered Paired Contrasts
+
+All contrasts are computed per-question on the common 88-qid subset. Reported: mean signed Brier delta (positive = condition `a` worse); 95% bootstrap CI on the mean delta; sign-test win counts (`a`-better / `b`-better / ties); two-sided exact sign-test p-value. No multiple-comparison correction is applied to the table (Holm-Bonferroni was pre-registered; see §8.7 for the corrected version).
+
+| Contrast                                 | Mean Δ | 95% CI of Δ           | a-better | b-better | Ties | p (sign test) |
+| ---------------------------------------- | -----: | --------------------- | -------: | -------: | ---: | ------------: |
+| **Persona vs. Analyst (E1 − E3, same briefing)**    | +0.028 | [−0.013, +0.071]      | 41 | 47 | 0 | **0.59** |
+| Briefing vs. no briefing (E1 − E2, Trump persona)   | −0.026 | [−0.064, +0.004]      | 47 | 39 | 2 |         0.45 |
+| Broad vs. refined retrieval (E1 − E2′, Trump)       | −0.009 | [−0.040, +0.020]      | 40 | 45 | 3 |         0.66 |
+| Broad vs. compressed retrieval (E1 − E1′, Trump)    | −0.022 | [−0.058, +0.007]      | 40 | 43 | 5 |         0.83 |
+| Web search vs. CHRONOS (E3 − E4, analyst)           | +0.042 | [−0.038, +0.123]      | 37 | 51 | 0 |         0.17 |
+
+**Every contrast's 95% CI on the mean Brier delta crosses zero.** Every two-sided sign-test p-value exceeds 0.15. The pre-registered primary contrast — persona vs. analyst with matched retrieval, E1 − E3 — not only does not reach significance, its direction is the opposite of the persona-helps hypothesis: the analyst condition (E3) produced a *lower* mean Brier than the matched-retrieval persona condition (E1), 0.483 vs. 0.511, with 47/88 questions favoring the analyst and 41/88 favoring the persona.
+
+### 8.5 Stratified Analysis
+
+**By question format** (common 88):
+
+| Cond. | Binary Brier (n=50) | Action Brier (n=38) |
+| ----- | ------------------: | ------------------: |
+| E1    |              0.3139 |              0.7712 |
+| E1′   |              0.3342 |              0.7951 |
+| E2′   |              0.3255 |              0.7777 |
+| E2    |              0.3231 |              0.8200 |
+| E3    |              0.2774 |              0.7535 |
+| E4    |          **0.2191** |          **0.7326** |
+
+Rankings are consistent across the two question-format partitions: E4 best, E3 second, Trump-persona conditions cluster below. Action-question Brier is ~2.3× binary-question Brier in every condition, reflecting the (unnormalized) multiclass scale difference.
+
+**By difficulty** (common 88; difficulty labels from manifest):
+
+| Cond. | hard (n=61) | medium (n=27) |
+| ----- | ----------: | ------------: |
+| E1    |      0.4116 |        0.7369 |
+| E1′   |      0.4228 |        0.7828 |
+| E2′   |      0.4078 |        0.7761 |
+| E2    |      0.4124 |        0.8208 |
+| E3    |      0.3698 |        0.7387 |
+| E4    |      0.3171 |        0.7205 |
+
+The difficulty labels assigned by the question-generation pipeline invert relative to Brier: *harder* questions have *lower* Brier across every condition. This is consistent with the pipeline's labeling using base-rate-extremity (hard = low base rate for the true outcome = easier to be calibrated-low on) rather than decision-space-complexity. We do not restake the "hard questions are harder" claim on the data; the per-condition ordering is robust across the two subsets regardless.
+
+**By domain** (common 88):
+
+| Cond. | executive_orders (18) | foreign_policy (12) | legal/judicial (8) | legislative (11) | personnel (6) | public_comms (9) | trade/tariffs (24) |
+| ----- | --------------------: | ------------------: | -----------------: | ---------------: | ------------: | ---------------: | -----------------: |
+| E1    |                0.5655 |              0.6280 |             0.5089 |           0.4781 |        0.4057 |           0.3831 |             0.5031 |
+| E1′   |                0.5786 |              0.6027 |             0.5402 |           0.5466 |        0.4320 |           0.3874 |             0.5360 |
+| E2′   |                0.5838 |              0.6315 |             0.5459 |           0.5138 |        0.3902 |           0.3494 |             0.5099 |
+| E2    |                0.5651 |              0.6323 |             0.5052 |           0.5317 |        0.4920 |           0.3396 |             0.5691 |
+| E3    |                0.5009 |              0.5100 |             0.4777 |           0.4422 |        0.4624 |           0.5085 |             0.4720 |
+| E4    |                0.4839 |              0.5156 |         **0.2499** |           0.4492 |        0.3075 |           0.5315 |             0.4304 |
+
+E4's largest single advantage is in `legal/judicial` (0.25 vs. E1's 0.51), where live web search presumably surfaces post-decision case names and rulings that CHRONOS had not yet harvested for those questions. Conversely, `public_comms` is the only domain where the persona conditions collectively outperform both analyst conditions — a domain where stylistic and rhetorical priors might plausibly help the persona. We flag these as suggestive cross-domain patterns without making statistical claims about them at n = 6–24 per cell.
+
+### 8.6 Sample-Level Variance
+
+Mean intra-question standard deviation of p(correct) across the 5 samples, per condition:
+
+| Cond. | Mean σ | Max σ |
+| ----- | -----: | ----: |
+| E1    | 0.068 | 0.271 |
+| E1′   | 0.058 | 0.265 |
+| E2′   | 0.064 | 0.337 |
+| E2    | 0.062 | 0.287 |
+| E3    | 0.086 | 0.311 |
+| E4    | 0.127 | 0.424 |
+
+E4's intra-question variance is roughly twice the other conditions'. Inspecting the within-question sample trajectory for high-variance cases shows that Tavily's retrieved results change subtly across samples even at fixed query, and Gemini responds with strongly sample-dependent probabilities. This is a known failure mode of web-grounded forecasting and it cuts both ways: high variance means E4's apparent Brier advantage is less robust to sample size than the persona-conditions' Brier.
+
+### 8.7 Multiple Comparison Correction
+
+Applying Holm-Bonferroni to the four pre-registered contrasts (persona, briefing, compression, web-vs-curated) — excluding E2′ as post-hoc — yields no change in substantive conclusion: every uncorrected p-value already exceeds 0.15, so Holm-Bonferroni-adjusted α is trivially satisfied for the null. We do not report adjusted p-values individually because, in the absence of any uncorrected p < 0.05, the correction is vacuous.
+
+### 8.8 What the Data Does and Does Not Support
+
+The pre-registered claims we set out to test, and their status in this evaluation:
+
+- **Persona framing unlocks predictive signal over matched-retrieval analyst.** *Not supported.* Point estimate was in the opposite direction; CI crossed zero; p = 0.59.
+- **CHRONOS retrieval improves over no retrieval for the persona model.** *Directionally supported, not significant.* Mean Brier was lower with retrieval by 0.026 Brier units; p = 0.45; 47/88 questions favored retrieval.
+- **Retrieval refinement (E2′) improves over broad retrieval.** *Not supported.* Refined retrieval was statistically indistinguishable from broad top-15 on forecasting quality despite using ~1/8 the input tokens. The cost-efficiency case for refinement survives; the accuracy case does not.
+- **Retrieval compression (E1′) is worse than broad retrieval.** *Directionally supported, not significant.* Compressed top-8 had Brier 0.022 higher than broad top-15; p = 0.83.
+- **Live web search is at least as good as curated CHRONOS briefings for the analyst model.** *Directionally supported, not significant, with 23.9% attrition.* E4's nominal advantage over E3 is 0.042 Brier units favoring web search; p = 0.17.
+
+The strongest single statement the data support is the converse of our originating hypothesis: **in this evaluation, on this question set, with this model, a leader-neutral careful-analyst framing tied 41–47 against the full persona framing on matched retrieval, and the analyst with live web search produced the lowest nominal mean Brier of any condition.**
+
+### 8.9 Interpretation and Limitations
+
+We draw four interpretive observations from these results, and list the limitations that bound the claims we can responsibly make from them.
+
+1. **The main hypothesis — that LLM persona conditioning unlocks leader-specific predictive signal beyond what a careful analyst framing achieves with matched retrieval — is not supported by this evaluation.** We do not claim it is refuted, because the effect's 95% CI spans [−0.013, +0.071] and sample size (N = 88 questions × 5 samples = 440 per-sample observations, or n = 88 at the per-question level) leaves the door open to a small true effect. But the direction of the point estimate favors analyst, not persona, and if there is a persona effect it must be small enough to be invisible at our power. This was a pre-registered possible outcome; we pre-committed to publishing it.
+2. **CHRONOS retrieval did not meaningfully separate the persona conditions from each other.** The four persona conditions (E1, E1′, E2′, E2) had Brier means in a range of 0.026 — smaller than within-condition sample variance. Whether the persona model received broad-15, broad-8, refined, or zero CHRONOS events, its answers were approximately the same, on average. Either (a) the persona's parametric knowledge of Trump's decision patterns is sufficient to dominate the retrieval signal, or (b) the persona framing suppresses attention to supplied context in favor of prior beliefs, or (c) retrieval content is sufficiently variable that per-sample gains and losses average out — we cannot distinguish these hypotheses with the present data.
+3. **The live-web-search condition's apparent advantage is fragile.** E4 had the lowest raw Brier but also (i) 23.9% attrition from genuine condition-specific failures, (ii) 2× the intra-question sample variance of other conditions, and (iii) a CI on its advantage over E3 that spans [−0.038, +0.123]. The web-search-helps story is a plausible hypothesis the data are *consistent with*, not one the data *establish*.
+4. **On the E1 vs. E3 pre-registered contrast, the persona condition and the analyst condition behaved similarly across the question set** — 41 questions favored the persona, 47 favored the analyst, 0 ties. The paired distribution is close to a coin flip on which framing wins a given question. This does not support either framing as the better choice; it supports neither framing as reliably better than the other with matched retrieval, at this sample size.
+
+**Limitations.**
+
+- **Single evaluated model.** All six conditions use Gemini 2.5 Flash. Effects of persona framing have been shown to be model-family-dependent (Kovarikova et al., 2025). A null on Gemini 2.5 Flash does not generalize to frontier reasoners; a larger effect could plausibly exist on Opus 4.7 or GPT-5 and be worth re-running the evaluation to detect.
+- **Sample size.** 103 resolvable questions × 5 samples gives modest statistical power to detect small effects. A true persona effect of ~0.01–0.02 Brier units would require several hundred questions to detect reliably. The pre-registered plan was N = 10 samples; we ran N = 5.
+- **E4 attrition.** 15 questions (14.6%) have no valid E4 sample; E4 conclusions rest on an 88-qid subset. While our sensitivity check (§8.2) suggests the E4-missing set is not systematically harder, we cannot rule out small survivorship-bias effects on the E4 rankings.
+- **E4 temporal leakage (Tavily).** The live-web-search condition filters Tavily results by `published_date ≤ simulation_date` where that field is present, but many Tavily results lack a parseable published_date and are therefore not filtered. Manual inspection of E4 reasoning text on individual questions confirmed occasional references to events post-dating the simulation date. The effect of this on E4 is not a one-way advantage: we observed E4 both (a) correctly citing post-sim-date events that would have revealed the ground truth, and (b) confabulating plausible-sounding but incorrect post-sim-date events that led it to the wrong answer. The net direction on mean Brier is ambiguous.
+- **Question generation pipeline asymmetry.** Some questions may systematically favor one condition (e.g., questions whose resolution appears verbatim in web search results but not in the CHRONOS knowledge base) in ways not detected at manifest-lock time.
+- **Temperature.** Both persona and analyst were sampled at T = 1.0, which is the default temperature for Gemini 2.5 Flash and maximizes sample-to-sample variance. A temperature ablation is planned.
+
+**What we would run next, given these results.** First, re-run E1 vs. E3 specifically on a frontier reasoner (Claude Opus 4.7) to test whether the null on Gemini 2.5 Flash generalizes or is model-specific. Second, expand the action-selection question set, since per-format scores cluster tightly in binary questions and diverge more in action questions — suggesting that measurable condition effects may be concentrated in the richer outcome space. Third, instrument E4 with a strict sim-date filter that drops Tavily results lacking a published_date rather than admitting them, and re-score to bound the temporal-leakage effect.
+
+The system — CHRONOS as implemented, the research swarm, the two-pass resolution protocol, the question manifest — ran end-to-end without methodological problems at the level of the evaluation infrastructure. The hypothesis it was built to test was not vindicated by this run. We report the result as we pre-committed to: honestly, directionally, with every number visible to the reader, in advance of any re-run on a frontier model.
 
 ---
 

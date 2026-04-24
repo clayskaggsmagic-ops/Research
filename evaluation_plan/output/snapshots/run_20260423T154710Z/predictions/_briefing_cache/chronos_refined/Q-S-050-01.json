@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['US Senate', 'House of Representatives', 'President Trump'], topics=['sports', 'transgender rights', 'Title IX', 'cloture', 'filibuster', 'congressional legislation'].",
+  "hash": "14b5604aea94dc88",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

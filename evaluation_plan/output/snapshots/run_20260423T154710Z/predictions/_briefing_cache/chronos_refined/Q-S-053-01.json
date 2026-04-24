@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['U.S. House of Representatives', 'U.S. Senate', 'Trump administration', 'Republican Party'], topics=['budget resolution', 'fiscal year 2026', 'tax reconciliation', 'Tax Cuts and Jobs Act', 'congressional budget process'].",
+  "hash": "3dcbb824f36ed163",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

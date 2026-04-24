@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING (events grouped by probative direction).\nRetrieval hints: actors=['Donald Trump', 'Trump administration', 'NATO'], topics=['nato', 'defense spending', 'foreign policy', 'alliances', 'geopolitics'].",
+  "hash": "ef74725d0a3b61e8",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

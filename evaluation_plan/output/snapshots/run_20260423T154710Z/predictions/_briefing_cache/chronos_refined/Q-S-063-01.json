@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['Trump administration', 'U.S. District Court for the District of Maryland', 'President', 'Attorney General'], topics=['executive orders', 'judicial injunctions', 'administrative state', 'separation of powers', 'appellate procedure'].",
+  "hash": "7e9634c5625b450a",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

@@ -22,6 +22,8 @@ class ModelConfig:
         "gpt-4.1": date(2024, 6, 1),
         "claude-3.5-sonnet": date(2024, 4, 1),
         "claude-4-sonnet": date(2025, 1, 1),
+        "gemini-2.0-flash": date(2024, 6, 1),
+        "gemini-2.0-flash-lite": date(2024, 8, 1),
         "gemini-2.5-flash": date(2025, 1, 1),
         "gemini-2.5-pro": date(2025, 1, 1),
         "gemini-3-pro": date(2025, 6, 1),

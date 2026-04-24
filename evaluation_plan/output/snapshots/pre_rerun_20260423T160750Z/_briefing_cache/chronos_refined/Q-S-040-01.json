@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['U.S. Secretary of State', 'U.S. National Security Advisor', 'President of Panama', 'President Jos\u00e9 Ra\u00fal Mulino'], topics=['panama canal', 'treaty negotiations', 'diplomatic visit', 'us-panama relations', 'china influence'].",
+  "hash": "38ece3a37b69cd52",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

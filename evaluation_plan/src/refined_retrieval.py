@@ -133,8 +133,42 @@ def _event_key(ev: dict) -> str:
     return str(ev.get("event_id") or ev.get("id") or ev.get("url") or ev.get("title") or hash(json.dumps(ev, sort_keys=True, default=str)))
 
 
-async def _expand_query(question: dict, refiner_model_id: str, sim_date: date) -> dict:
+def _refiner_invoke(chat, messages):
+    """Invoke a refiner chat with transient-error retry (429, 5xx, disconnects)."""
+    import time
+    from evaluation_plan.src.llm_client import _is_transient
+    delays = [2, 8, 30, 60, 120]
+    last_exc = None
+    for attempt in range(len(delays) + 1):
+        try:
+            return chat.invoke(messages)
+        except Exception as e:
+            last_exc = e
+            if attempt == len(delays) or not _is_transient(e):
+                raise
+            time.sleep(delays[attempt])
+    raise last_exc  # unreachable
+
+
+def _build_refiner(refiner_model_id: str, max_tokens: int):
+    from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore  # noqa: F401
+
+    if refiner_model_id.lower().startswith(("gemini", "models/gemini")):
+        from langchain_google_genai import ChatGoogleGenerativeAI  # type: ignore
+
+        return ChatGoogleGenerativeAI(
+            model=refiner_model_id,
+            temperature=0.0,
+            max_output_tokens=max_tokens,
+            timeout=120,
+            max_retries=3,
+        )
     from langchain_anthropic import ChatAnthropic  # type: ignore
+
+    return ChatAnthropic(model=refiner_model_id, temperature=0.0, max_tokens=max_tokens)
+
+
+async def _expand_query(question: dict, refiner_model_id: str, sim_date: date) -> dict:
     from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
 
     user = (
@@ -143,8 +177,8 @@ async def _expand_query(question: dict, refiner_model_id: str, sim_date: date) -
         f"BACKGROUND: {question.get('background', '')}\n"
         f"RESOLUTION CRITERIA: {question.get('resolution_criteria', '')}"
     )
-    chat = ChatAnthropic(model=refiner_model_id, temperature=0.0, max_tokens=512)
-    resp = chat.invoke([SystemMessage(content=EXPAND_SYSTEM), HumanMessage(content=user)])
+    chat = _build_refiner(refiner_model_id, max_tokens=512)
+    resp = _refiner_invoke(chat, [SystemMessage(content=EXPAND_SYSTEM), HumanMessage(content=user)])
     text = resp.content if isinstance(resp.content, str) else str(resp.content)
     try:
         return json.loads(text)
@@ -154,7 +188,6 @@ async def _expand_query(question: dict, refiner_model_id: str, sim_date: date) -
 
 
 async def _rerank_events(question: dict, events: list[dict], refiner_model_id: str) -> dict[str, str]:
-    from langchain_anthropic import ChatAnthropic  # type: ignore
     from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
 
     enumerated = []
@@ -169,8 +202,8 @@ async def _rerank_events(question: dict, events: list[dict], refiner_model_id: s
         f"RESOLUTION CRITERIA: {question.get('resolution_criteria', '')}\n\n"
         f"EVENTS (JSON):\n{json.dumps(enumerated, indent=2)}"
     )
-    chat = ChatAnthropic(model=refiner_model_id, temperature=0.0, max_tokens=2048)
-    resp = chat.invoke([SystemMessage(content=RERANK_SYSTEM), HumanMessage(content=user)])
+    chat = _build_refiner(refiner_model_id, max_tokens=2048)
+    resp = _refiner_invoke(chat, [SystemMessage(content=RERANK_SYSTEM), HumanMessage(content=user)])
     text = resp.content if isinstance(resp.content, str) else str(resp.content)
     try:
         obj = json.loads(text)

@@ -1,0 +1,72 @@
+[e2] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl dry_run=False
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/clayskaggs/Library/Python/3.9/lib/python/site-packages/langchain_google_genai/chat_models.py:47: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  from google.generativeai.caching import CachedContent  # type: ignore[import]
+[e2] dispatching 515 calls across 8 worker threads
+[e2]   10/515 done (0.4 calls/s)
+[e2]   20/515 done (0.4 calls/s)
+[e2]   30/515 done (0.5 calls/s)
+[e2]   40/515 done (0.5 calls/s)
+[e2]   50/515 done (0.5 calls/s)
+[e2]   60/515 done (0.5 calls/s)
+[e2]   70/515 done (0.5 calls/s)
+[e2]   80/515 done (0.6 calls/s)
+[e2]   90/515 done (0.6 calls/s)
+[e2]   100/515 done (0.6 calls/s)
+[e2]   110/515 done (0.6 calls/s)
+[e2]   120/515 done (0.6 calls/s)
+[e2]   130/515 done (0.6 calls/s)
+[e2]   140/515 done (0.6 calls/s)
+[e2]   150/515 done (0.6 calls/s)
+[e2]   160/515 done (0.6 calls/s)
+[e2]   170/515 done (0.6 calls/s)
+[e2]   180/515 done (0.7 calls/s)
+[e2]   190/515 done (0.7 calls/s)
+[e2]   200/515 done (0.7 calls/s)
+[e2]   210/515 done (0.7 calls/s)
+[e2]   220/515 done (0.7 calls/s)
+[e2]   230/515 done (0.7 calls/s)
+[e2]   240/515 done (0.7 calls/s)
+[e2]   250/515 done (0.7 calls/s)
+[e2]   260/515 done (0.7 calls/s)
+[e2]   270/515 done (0.7 calls/s)
+[e2]   280/515 done (0.7 calls/s)
+[e2]   290/515 done (0.7 calls/s)
+[e2]   300/515 done (0.7 calls/s)
+[e2]   310/515 done (0.7 calls/s)
+[e2]   320/515 done (0.7 calls/s)
+[e2]   330/515 done (0.7 calls/s)
+[e2]   340/515 done (0.7 calls/s)
+[e2]   350/515 done (0.7 calls/s)
+[e2]   360/515 done (0.7 calls/s)
+[e2]   370/515 done (0.7 calls/s)
+[e2]   380/515 done (0.7 calls/s)
+[e2]   390/515 done (0.7 calls/s)
+[e2]   400/515 done (0.7 calls/s)
+[e2]   410/515 done (0.7 calls/s)
+[e2]   420/515 done (0.7 calls/s)
+[e2]   430/515 done (0.7 calls/s)
+[e2]   440/515 done (0.7 calls/s)
+[e2]   450/515 done (0.7 calls/s)
+[e2]   460/515 done (0.7 calls/s)
+[e2]   470/515 done (0.7 calls/s)
+[e2]   480/515 done (0.7 calls/s)
+[e2]   490/515 done (0.7 calls/s)
+[e2]   500/515 done (0.7 calls/s)
+[e2]   510/515 done (0.7 calls/s)
+[e2]   515/515 done (0.7 calls/s)
+[e2] done. calls=515 skipped=0 elapsed=792.3s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl

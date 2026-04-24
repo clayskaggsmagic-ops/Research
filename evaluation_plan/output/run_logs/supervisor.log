@@ -1,0 +1,148 @@
+[supervisor] start Wed Apr 22 21:37:29 UTC 2026
+[supervisor] launch attempt #1 Wed Apr 22 21:37:29 UTC 2026
+===============================================================
+AUTONOMOUS EXPERIMENT RUN
+started: Wed Apr 22 21:37:29 UTC 2026
+host:    Clays-MacBook-Pro.local
+pwd:     /Users/clayskaggs/Developer/Research
+pid:     90532
+log:     evaluation_plan/output/run_logs/run_20260422T213729Z.log
+===============================================================
+
+--- [e3] start Wed Apr 22 21:37:29 UTC 2026 ---
+--- [e3] end Wed Apr 22 21:57:17 UTC 2026 rc=0 ---
+  [e3] [e3]   370/378 done (0.7 calls/s)
+  [e3] [e3]   378/378 done (0.7 calls/s)
+  [e3] [e3] done. calls=378 skipped=137 elapsed=539.3s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl
+
+--- [e5] start Wed Apr 22 21:57:17 UTC 2026 ---
+evaluation_plan/run_all.sh: line 39: 91554 Terminated: 15          python3 -m evaluation_plan.src.run_experiment --experiment "$EXP" --concurrency 8 >> "$EXP_LOG" 2>&1
+--- [e5] end Thu Apr 23 14:02:48 UTC 2026 rc=143 ---
+  [e5] Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised RetryError: Timeout of 600.0s exceeded, last exception: 503 DNS resolution failed for generativelanguage.googleapis.com:443: C-ares status is not ARES_SUCCESS qtype=A name=generativelanguage.googleapis.com is_balancer=0: Could not contact DNS servers.
+  [e5] Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised RetryError: Timeout of 600.0s exceeded, last exception: 503 DNS resolution failed for generativelanguage.googleapis.com:443: C-ares status is not ARES_SUCCESS qtype=SRV name=_grpclb._tcp.generativelanguage.googleapis.com: Could not contact DNS servers.
+  [e5] Retrying langchain_google_genai.chat_models._chat_with_retry.<locals>._chat_with_retry in 2.0 seconds as it raised RetryError: Timeout of 600.0s exceeded, last exception: 503 DNS resolution failed for generativelanguage.googleapis.com:443: C-ares status is not ARES_SUCCESS qtype=A name=generativelanguage.googleapis.com is_balancer=0: Could not contact DNS servers.
+[e5] FAILED (rc=143) — check evaluation_plan/output/run_logs/e5_20260422T213729Z.log
+
+--- [e1] start Thu Apr 23 14:02:48 UTC 2026 ---
+--- [e1] end Thu Apr 23 14:19:07 UTC 2026 rc=0 ---
+  [e1] [e1]   510/515 done (0.5 calls/s)
+  [e1] [e1]   515/515 done (0.5 calls/s)
+  [e1] [e1] done. calls=515 skipped=0 elapsed=957.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1/predictions.jsonl
+
+--- [e4] start Thu Apr 23 14:19:07 UTC 2026 ---
+--- [e4] end Thu Apr 23 14:43:30 UTC 2026 rc=0 ---
+  [e4] [e4]   510/515 done (0.4 calls/s)
+  [e4] [e4]   515/515 done (0.4 calls/s)
+  [e4] [e4] done. calls=515 skipped=0 elapsed=1461.9s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e4/predictions.jsonl
+
+--- [e1p] start Thu Apr 23 14:43:30 UTC 2026 ---
+--- [e1p] end Thu Apr 23 14:58:09 UTC 2026 rc=0 ---
+  [e1p] [e1p]   510/515 done (0.6 calls/s)
+  [e1p] [e1p]   515/515 done (0.6 calls/s)
+  [e1p] [e1p] done. calls=515 skipped=0 elapsed=856.4s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1p/predictions.jsonl
+
+--- [e2] start Thu Apr 23 14:58:09 UTC 2026 ---
+--- [e2] end Thu Apr 23 15:22:48 UTC 2026 rc=0 ---
+  [e2] [e2]   510/515 done (0.7 calls/s)
+  [e2] [e2]   515/515 done (0.7 calls/s)
+  [e2] [e2] done. calls=515 skipped=0 elapsed=792.3s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl
+
+===============================================================
+ALL EXPERIMENTS DONE
+finished: Thu Apr 23 15:22:48 UTC 2026
+===============================================================
+-rw-r--r--@ 1 clayskaggs  staff   773378 Apr 23 10:19 pipeline/output/predictions/e1/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   759361 Apr 23 10:58 pipeline/output/predictions/e1p/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   748368 Apr 23 11:22 pipeline/output/predictions/e2/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   729709 Apr 22 17:57 pipeline/output/predictions/e3/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff  1017963 Apr 23 10:43 pipeline/output/predictions/e4/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   429124 Apr 23 10:02 pipeline/output/predictions/e5/predictions.jsonl
+Record counts:
+  e1:      515 records (0
+0 errors)
+  e1p:      515 records (0
+0 errors)
+  e2:      515 records (0
+0 errors)
+  e3:      515 records (0
+0 errors)
+  e4:      515 records (1 errors)
+  e5:      319 records (114 errors)
+[supervisor] run_all exited rc=0 Thu Apr 23 15:22:48 UTC 2026
+[supervisor]   e1: 515 / 515
+[supervisor]   e1p: 515 / 515
+[supervisor]   e2: 515 / 515
+[supervisor]   e3: 515 / 515
+[supervisor]   e4: 515 / 515
+[supervisor]   e5: 319 / 515
+[supervisor] restarting in 30s...
+[supervisor] launch attempt #2 Thu Apr 23 15:23:18 UTC 2026
+===============================================================
+AUTONOMOUS EXPERIMENT RUN
+started: Thu Apr 23 15:23:19 UTC 2026
+host:    Clays-MacBook-Pro.local
+pwd:     /Users/clayskaggs/Developer/Research
+pid:     13091
+log:     evaluation_plan/output/run_logs/run_20260423T152319Z.log
+===============================================================
+
+--- [e3] start Thu Apr 23 15:23:19 UTC 2026 ---
+--- [e3] end Thu Apr 23 15:23:19 UTC 2026 rc=0 ---
+  [e3] [e3] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl dry_run=False
+  [e3] [e3] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl
+
+--- [e5] start Thu Apr 23 15:23:19 UTC 2026 ---
+--- [e5] end Thu Apr 23 15:40:26 UTC 2026 rc=0 ---
+  [e5] [e5]   190/196 done (0.3 calls/s)
+  [e5] [e5]   196/196 done (0.3 calls/s)
+  [e5] [e5] done. calls=196 skipped=319 elapsed=618.5s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl
+
+--- [e1] start Thu Apr 23 15:40:26 UTC 2026 ---
+--- [e1] end Thu Apr 23 15:40:27 UTC 2026 rc=0 ---
+  [e1] [e1] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1/predictions.jsonl dry_run=False
+  [e1] [e1] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1/predictions.jsonl
+
+--- [e4] start Thu Apr 23 15:40:27 UTC 2026 ---
+--- [e4] end Thu Apr 23 15:40:27 UTC 2026 rc=0 ---
+  [e4] [e4] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e4/predictions.jsonl dry_run=False
+  [e4] [e4] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e4/predictions.jsonl
+
+--- [e1p] start Thu Apr 23 15:40:27 UTC 2026 ---
+--- [e1p] end Thu Apr 23 15:40:28 UTC 2026 rc=0 ---
+  [e1p] [e1p] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1p/predictions.jsonl dry_run=False
+  [e1p] [e1p] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1p/predictions.jsonl
+
+--- [e2] start Thu Apr 23 15:40:28 UTC 2026 ---
+--- [e2] end Thu Apr 23 15:40:29 UTC 2026 rc=0 ---
+  [e2] [e2] model=gemini-2.5-flash questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl dry_run=False
+  [e2] [e2] done. calls=0 skipped=515 elapsed=0.0s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl
+
+===============================================================
+ALL EXPERIMENTS DONE
+finished: Thu Apr 23 15:40:29 UTC 2026
+===============================================================
+-rw-r--r--@ 1 clayskaggs  staff   773378 Apr 23 10:19 pipeline/output/predictions/e1/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   759361 Apr 23 10:58 pipeline/output/predictions/e1p/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   748368 Apr 23 11:22 pipeline/output/predictions/e2/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   729709 Apr 22 17:57 pipeline/output/predictions/e3/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff  1017963 Apr 23 10:43 pipeline/output/predictions/e4/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff   764771 Apr 23 11:40 pipeline/output/predictions/e5/predictions.jsonl
+Record counts:
+  e1:      515 records (0
+0 errors)
+  e1p:      515 records (0
+0 errors)
+  e2:      515 records (0
+0 errors)
+  e3:      515 records (0
+0 errors)
+  e4:      515 records (1 errors)
+  e5:      515 records (123 errors)
+[supervisor] run_all exited rc=0 Thu Apr 23 15:40:29 UTC 2026
+[supervisor]   e1: 515 / 515
+[supervisor]   e1p: 515 / 515
+[supervisor]   e2: 515 / 515
+[supervisor]   e3: 515 / 515
+[supervisor]   e4: 515 / 515
+[supervisor]   e5: 515 / 515
+[supervisor] all experiments at target; exit Thu Apr 23 15:40:29 UTC 2026

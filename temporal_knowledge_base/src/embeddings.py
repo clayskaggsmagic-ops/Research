@@ -37,6 +37,10 @@ async def embed_text(text: str) -> list[float]:
     return await model.aembed_query(text)
 
 
+# Alias for retrieval.py import compatibility.
+embed_query = embed_text
+
+
 async def embed_texts(texts: list[str]) -> list[list[float]]:
     """Embed multiple texts using batched API calls.
 

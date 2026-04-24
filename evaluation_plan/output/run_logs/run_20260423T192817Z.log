@@ -1,0 +1,65 @@
+===============================================================
+AUTONOMOUS EXPERIMENT RUN
+started: Thu Apr 23 19:28:17 UTC 2026
+host:    Clays-MacBook-Pro.local
+pwd:     /Users/clayskaggs/Developer/Research
+pid:     21989
+log:     evaluation_plan/output/run_logs/run_20260423T192817Z.log
+===============================================================
+
+--- [e3] start Thu Apr 23 19:28:17 UTC 2026 ---
+--- [e3] end Thu Apr 23 19:28:30 UTC 2026 rc=0 ---
+  [e3] [e3] dispatching 7 calls across 7 worker threads
+  [e3] [e3]   7/7 done (0.5 calls/s)
+  [e3] [e3] done. calls=7 skipped=508 elapsed=12.7s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e3/predictions.jsonl
+
+--- [e5] start Thu Apr 23 19:28:30 UTC 2026 ---
+--- [e5] end Thu Apr 23 20:40:50 UTC 2026 rc=0 ---
+  [e5] [e5]   510/515 done (0.3 calls/s)
+  [e5] [e5]   515/515 done (0.3 calls/s)
+  [e5] [e5] done. calls=515 skipped=0 elapsed=1601.3s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl
+
+--- [e1] start Thu Apr 23 20:40:50 UTC 2026 ---
+--- [e1] end Thu Apr 23 20:45:44 UTC 2026 rc=0 ---
+  [e1] [e1]   510/515 done (1.8 calls/s)
+  [e1] [e1]   515/515 done (1.8 calls/s)
+  [e1] [e1] done. calls=515 skipped=0 elapsed=279.8s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1/predictions.jsonl
+
+--- [e4] start Thu Apr 23 20:45:44 UTC 2026 ---
+--- [e4] end Thu Apr 23 20:48:59 UTC 2026 rc=0 ---
+  [e4] [e4]   510/515 done (2.6 calls/s)
+  [e4] [e4]   515/515 done (2.6 calls/s)
+  [e4] [e4] done. calls=515 skipped=0 elapsed=194.7s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e4/predictions.jsonl
+
+--- [e1p] start Thu Apr 23 20:48:59 UTC 2026 ---
+--- [e1p] end Thu Apr 23 20:52:27 UTC 2026 rc=0 ---
+  [e1p] [e1p]   510/515 done (2.8 calls/s)
+  [e1p] [e1p]   515/515 done (2.8 calls/s)
+  [e1p] [e1p] done. calls=515 skipped=0 elapsed=185.8s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1p/predictions.jsonl
+
+--- [e2] start Thu Apr 23 20:52:27 UTC 2026 ---
+--- [e2] end Thu Apr 23 21:00:00 UTC 2026 rc=1 ---
+  [e2]   File "/Users/clayskaggs/Developer/Research/temporal_knowledge_base/.venv/lib/python3.12/site-packages/langchain_google_genai/chat_models.py", line 166, in _handle_client_error
+  [e2]     raise ChatGoogleGenerativeAIError(msg) from e
+  [e2] langchain_google_genai.chat_models.ChatGoogleGenerativeAIError: Error calling model 'gemini-2.0-flash-lite' (RESOURCE_EXHAUSTED): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Resource exhausted. Please try again later. Please refer to https://cloud.google.com/vertex-ai/generative-ai/docs/error-code-429 for more details.', 'status': 'RESOURCE_EXHAUSTED'}}
+[e2] FAILED (rc=1) — check evaluation_plan/output/run_logs/e2_20260423T192817Z.log
+
+===============================================================
+ALL EXPERIMENTS DONE
+finished: Thu Apr 23 21:00:00 UTC 2026
+===============================================================
+-rw-r--r--@ 1 clayskaggs  staff  737118 Apr 23 16:45 pipeline/output/predictions/e1/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff  712646 Apr 23 16:52 pipeline/output/predictions/e1p/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff  630938 Apr 23 15:28 pipeline/output/predictions/e3/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff  958423 Apr 23 16:48 pipeline/output/predictions/e4/predictions.jsonl
+-rw-r--r--@ 1 clayskaggs  staff  752547 Apr 23 16:40 pipeline/output/predictions/e5/predictions.jsonl
+Record counts:
+  e1:      515 records (0
+0 errors)
+  e1p:      515 records (0
+0 errors)
+  e3:      515 records (0
+0 errors)
+  e4:      515 records (0
+0 errors)
+  e5:      515 records (106 errors)

@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['U.S. Environmental Protection Agency', 'EPA', 'PM2.5 NAAQS rule'], topics=['epa', 'naaqs', 'pm2.5', 'air quality standards', 'regulation', 'deregulation', 'environmental policy'].",
+  "hash": "3df63e53d2b49602",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

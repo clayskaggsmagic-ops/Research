@@ -1,0 +1,38 @@
+[e1] model=gemini-2.0-flash-lite questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e1/predictions.jsonl dry_run=False
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/clayskaggs/Developer/Research/evaluation_plan/src/run_experiment.py", line 310, in <module>
+    sys.exit(_main())
+             ^^^^^^^
+  File "/Users/clayskaggs/Developer/Research/evaluation_plan/src/run_experiment.py", line 295, in _main
+    run(
+  File "/Users/clayskaggs/Developer/Research/evaluation_plan/src/run_experiment.py", line 192, in run
+    {} if dry_run else asyncio.run(_gather_briefings())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/Developer/Research/evaluation_plan/src/run_experiment.py", line 188, in _gather_briefings
+    results = await asyncio.gather(*[_one(q) for q in questions])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/Developer/Research/evaluation_plan/src/run_experiment.py", line 186, in _one
+    return q["question_id"], await briefing.aget(q, model_id)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/Developer/Research/evaluation_plan/src/briefings.py", line 108, in aget
+    briefing = await self._retrieve(question, model_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/Developer/Research/evaluation_plan/src/briefings.py", line 120, in _retrieve
+    from temporal_knowledge_base.src.retrieval import retrieve  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/clayskaggs/Developer/Research/temporal_knowledge_base/src/retrieval.py", line 7, in <module>
+    from .config import ModelConfig, settings
+  File "/Users/clayskaggs/Developer/Research/temporal_knowledge_base/src/config.py", line 9, in <module>
+    from pydantic_settings import BaseSettings
+ModuleNotFoundError: No module named 'pydantic_settings'

@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['ACLU', 'Donald Trump'], topics=['executive order', 'lgbtq+ rights', 'gender identity', 'civil liberties', 'federal lawsuit'].",
+  "hash": "c84bb96790b409f1",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

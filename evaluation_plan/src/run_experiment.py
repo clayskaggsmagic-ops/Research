@@ -29,8 +29,11 @@ building pipelines only.
 from __future__ import annotations
 
 import argparse
+import asyncio
 import sys
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from evaluation_plan.src.briefings import (
@@ -50,6 +53,7 @@ from evaluation_plan.src.llm_client import predict_action, predict_binary
 from evaluation_plan.src.prompts import option_letters_for, render_messages
 from evaluation_plan.src.web_search_tool import (
     augment_system_with_temporal_constraint,
+    tavily_search_context,
     web_search_tool_spec,
 )
 
@@ -134,6 +138,7 @@ def run(
     samples_override: int | None = None,
     resume: bool = True,
     dry_run: bool = False,
+    concurrency: int = 8,
 ) -> Path:
     cfg = load_config(config_path)
     model_id = cfg["model"]["id"]
@@ -159,18 +164,58 @@ def run(
     print(f"[{experiment_id}] model={model_id} questions={len(questions)} "
           f"samples={n_samples} out={out} dry_run={dry_run}")
 
-    tools = [web_search_tool_spec(max_uses=cfg['web_search']['max_results_per_question'])] if uses_web_search else None
+    provider = cfg["model"].get("provider", "anthropic")
+    tools = None
+    if uses_web_search:
+        spec_tool = web_search_tool_spec(
+            max_uses=cfg['web_search']['max_results_per_question'],
+            provider=provider,
+        )
+        # For Gemini we pre-retrieve via Tavily; no model-side tool needed.
+        tools = [spec_tool] if spec_tool is not None else None
 
-    t_start = time.perf_counter()
-    n_calls = 0
+    # Build all briefings in a SINGLE event loop so the asyncpg pool
+    # (module-level in temporal_knowledge_base.database) only sees one loop.
+    # Multiple asyncio.run() calls across questions would leak pool connections
+    # into subsequent closed loops → "Future attached to a different loop".
+    async def _gather_briefings() -> dict[str, tuple[str | None, str | None]]:
+        sem = asyncio.Semaphore(4)  # cap concurrent DB+embedding+refiner calls
+
+        async def _one(q):
+            async with sem:
+                return q["question_id"], await briefing.aget(q, model_id)
+
+        results = await asyncio.gather(*[_one(q) for q in questions])
+        return dict(results)
+
+    briefings_map: dict[str, tuple[str | None, str | None]] = (
+        {} if dry_run else asyncio.run(_gather_briefings())
+    )
+
+    call_plan: list[tuple[dict, int, str, str, str, str | None]] = []
     n_skipped = 0
     for q in questions:
         qid = q["question_id"]
-        brief_text, brief_hash = briefing.get(q, model_id) if not dry_run else (None, None)
+        brief_text, brief_hash = briefings_map.get(qid, (None, None)) if not dry_run else (None, None)
+
+        if uses_web_search and provider == "google" and not dry_run:
+            from datetime import date as _date
+            ws_cfg = cfg["web_search"]
+            search_ctx = tavily_search_context(
+                query=q["question_text"],
+                simulation_date=_date.fromisoformat(q["simulation_date"]),
+                max_results=ws_cfg.get("max_results_per_question", 20),
+                strict_date_filter=ws_cfg.get("enforce_temporal_filter", True),
+                max_kept=ws_cfg.get("max_kept_results", 10),
+                snippet_chars=ws_cfg.get("snippet_chars", 300),
+            )
+            brief_text = search_ctx or None
+            if brief_text:
+                from evaluation_plan.src.io_utils import sha256_short as _sha
+                brief_hash = _sha(brief_text)
 
         system_name = spec["system_prompt_name"]
         system_text, user_text, prompt_hash = render_messages(q, system_name, brief_text)
-
         if uses_web_search:
             system_text = augment_system_with_temporal_constraint(system_text, q["simulation_date"])
 
@@ -182,25 +227,48 @@ def run(
                 print(f"  would call: qid={qid} sample={i} prompt_hash={prompt_hash} "
                       f"briefing_hash={brief_hash}")
                 continue
+            call_plan.append((q, i, system_text, user_text, prompt_hash, brief_hash))
 
-            fmt = q["question_type"]
-            if fmt == "binary":
-                rec = predict_binary(
-                    question_id=qid, experiment=experiment_id, sample_idx=i,
-                    model_id=model_id, temperature=temperature, max_tokens=max_tokens,
-                    system_text=system_text, user_text=user_text,
-                    prompt_hash=prompt_hash, briefing_hash=brief_hash, tools=tools,
-                )
-            else:
-                rec = predict_action(
-                    question_id=qid, experiment=experiment_id, sample_idx=i,
-                    model_id=model_id, temperature=temperature, max_tokens=max_tokens,
-                    system_text=system_text, user_text=user_text,
-                    prompt_hash=prompt_hash, briefing_hash=brief_hash,
-                    option_letters=option_letters_for(q), tools=tools,
-                )
+    t_start = time.perf_counter()
+    n_calls = 0
+    write_lock = threading.Lock()
+
+    def _do_call(item):
+        q, i, system_text, user_text, prompt_hash, brief_hash = item
+        qid = q["question_id"]
+        fmt = q["question_type"]
+        if fmt == "binary":
+            rec = predict_binary(
+                question_id=qid, experiment=experiment_id, sample_idx=i,
+                model_id=model_id, temperature=temperature, max_tokens=max_tokens,
+                system_text=system_text, user_text=user_text,
+                prompt_hash=prompt_hash, briefing_hash=brief_hash, tools=tools,
+            )
+        else:
+            rec = predict_action(
+                question_id=qid, experiment=experiment_id, sample_idx=i,
+                model_id=model_id, temperature=temperature, max_tokens=max_tokens,
+                system_text=system_text, user_text=user_text,
+                prompt_hash=prompt_hash, briefing_hash=brief_hash,
+                option_letters=option_letters_for(q), tools=tools,
+            )
+        with write_lock:
             append_prediction(out, rec)
-            n_calls += 1
+        return rec
+
+    if call_plan and not dry_run:
+        workers = max(1, min(concurrency, len(call_plan)))
+        print(f"[{experiment_id}] dispatching {len(call_plan)} calls "
+              f"across {workers} worker threads")
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = [pool.submit(_do_call, item) for item in call_plan]
+            for f in as_completed(futures):
+                f.result()  # re-raise any uncaught exception (rare — predict_* capture)
+                n_calls += 1
+                if n_calls % 10 == 0 or n_calls == len(call_plan):
+                    rate = n_calls / max(0.1, time.perf_counter() - t_start)
+                    print(f"[{experiment_id}]   {n_calls}/{len(call_plan)} done "
+                          f"({rate:.1f} calls/s)")
 
     elapsed = time.perf_counter() - t_start
     print(f"[{experiment_id}] done. calls={n_calls} skipped={n_skipped} elapsed={elapsed:.1f}s "
@@ -221,6 +289,8 @@ def _main() -> int:
     ap.add_argument("--samples", type=int, default=None, help="Override samples_per_question")
     ap.add_argument("--no-resume", action="store_true")
     ap.add_argument("--dry-run", action="store_true", help="Print call plan without calling APIs")
+    ap.add_argument("--concurrency", type=int, default=8,
+                    help="Thread-pool size for parallel LLM calls (default 8)")
     args = ap.parse_args()
     run(
         experiment_id=args.experiment,
@@ -231,6 +301,7 @@ def _main() -> int:
         samples_override=args.samples,
         resume=not args.no_resume,
         dry_run=args.dry_run,
+        concurrency=args.concurrency,
     )
     return 0
 

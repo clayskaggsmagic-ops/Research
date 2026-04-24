@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING (events grouped by probative direction).\nRetrieval hints: actors=['White House Office of Management and Budget', 'U.S. AI Safety Institute', 'National Institute of Standards and Technology', 'President Biden'], topics=['ai-safety', 'budget', 'appropriations', 'rescission', 'reallocation', 'regulation', 'executive-order'].",
+  "hash": "0a40b517ef62b928",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

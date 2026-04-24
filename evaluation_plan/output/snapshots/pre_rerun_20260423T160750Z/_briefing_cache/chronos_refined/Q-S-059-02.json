@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['U.S. President', 'White House Press Secretary', 'Federal Reserve', 'Jerome Powell'], topics=['federal funds rate', 'monetary policy', 'interest rates', 'economic policy', 'US politics'].",
+  "hash": "001edb56cc591b61",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

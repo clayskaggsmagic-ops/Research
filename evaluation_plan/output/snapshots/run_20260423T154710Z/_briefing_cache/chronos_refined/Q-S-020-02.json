@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['Department of Agriculture', 'Department of Commerce', 'Department of Defense', 'Department of Education', 'Department of Energy', 'Department of Health and Human Services', 'Department of Homeland Security', 'Department of Housing and Urban Development', 'Department of the Interior', 'Department of Justice', 'Department of Labor', 'Department of State', 'Department of Transportation', 'Department of the Treasury', 'Department of Veterans Affairs'], topics=['DEI', 'government policy', 'executive branch', 'federal agencies'].",
+  "hash": "86761956dea457db",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

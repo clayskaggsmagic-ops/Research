@@ -38,6 +38,12 @@ class BriefingProvider(ABC):
         """Return (briefing_text, briefing_hash). Either may be None (no briefing)."""
         ...
 
+    async def aget(self, question: dict, model_id: str) -> tuple[str | None, str | None]:
+        """Async variant. Default: reuse sync `get()`. Subclasses that touch the
+        database MUST override so a single event loop can batch them without
+        cross-loop asyncpg pool errors."""
+        return self.get(question, model_id)
+
     # ── Disk cache ──
     def _cache_path(self, question_id: str) -> Path | None:
         if not self.cache_dir:
@@ -86,6 +92,20 @@ class ChronosBroad(BriefingProvider):
         if cached:
             return cached
         briefing = asyncio.run(self._retrieve(question, model_id))
+        h = sha256_short(briefing)
+        self._save_cached(
+            question["question_id"],
+            briefing,
+            h,
+            meta={"variant": self.name, "top_k": self.top_k, "model_id": model_id},
+        )
+        return briefing, h
+
+    async def aget(self, question: dict, model_id: str) -> tuple[str | None, str | None]:
+        cached = self._load_cached(question["question_id"])
+        if cached:
+            return cached
+        briefing = await self._retrieve(question, model_id)
         h = sha256_short(briefing)
         self._save_cached(
             question["question_id"],
@@ -146,6 +166,25 @@ class ChronosRefined(BriefingProvider):
                 keep_max=self.keep_max,
             )
         )
+        return self._save_and_hash(question, model_id, briefing)
+
+    async def aget(self, question: dict, model_id: str) -> tuple[str | None, str | None]:
+        cached = self._load_cached(question["question_id"])
+        if cached:
+            return cached
+        from evaluation_plan.src.refined_retrieval import refine_briefing  # local import
+
+        briefing = await refine_briefing(
+            question=question,
+            model_id=model_id,
+            refiner_model_id=self.refiner_model_id,
+            over_retrieve_k=self.over_retrieve_k,
+            keep_min=self.keep_min,
+            keep_max=self.keep_max,
+        )
+        return self._save_and_hash(question, model_id, briefing)
+
+    def _save_and_hash(self, question: dict, model_id: str, briefing: str) -> tuple[str, str]:
         h = sha256_short(briefing)
         self._save_cached(
             question["question_id"],

@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING (events grouped by probative direction).\nRetrieval hints: actors=['Internal Revenue Service', 'U.S. House of Representatives', 'U.S. Senate', 'President of the United States'], topics=['appropriations', 'government funding', 'rescission', 'IRS', 'Inflation Reduction Act'].",
+  "hash": "c28445249109e613",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

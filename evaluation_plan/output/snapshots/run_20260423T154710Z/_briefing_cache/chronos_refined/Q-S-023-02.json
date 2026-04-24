@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['State Department', 'Department of Health and Human Services', 'Department of Justice', 'Bureau of Prisons', 'Office of Management and Budget', 'Office of Personnel Management'], topics=['executive order', 'gender policy', 'federal agencies', 'implementation'].",
+  "hash": "011c4937eb93fa03",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}

@@ -1,27 +1,36 @@
 # Pinned configuration for the leader-prediction experiments.
 # Change requires a new experiment version — do not edit in place after a run.
 
-version: "1.0"
+version: "1.2-gemini-2.0-flash-lite"
 
-# Primary model used for all five experiments' predictions.
-# Must be held constant across E1-E5 so Brier deltas are attributable to
-# persona / context, not model capability.
+# Primary model for all six experiments' predictions. Held constant across
+# E1-E5 so Brier deltas are attributable to persona / context, not model.
+#
+# Rationale (2026-04-23 audit):
+#   - Gemini 2.5 Flash cutoff = Jan 2025 → overlaps 58/104 simulation dates.
+#   - Gemini 2.0 Flash cutoff = June 2024 → clean, but quota-blocked on key.
+#   - Gemini 2.0 Flash-Lite cutoff = Aug 2024 → clean (earliest sim is
+#     2025-01-02), quota-available, same training-data family as 2.0 Flash.
+# All 104 questions are post-cutoff → no pretraining leakage possible.
 model:
-  provider: anthropic
-  id: claude-opus-4-7
+  provider: google
+  id: gemini-2.0-flash-lite
   temperature: 1.0
-  max_tokens: 1024
+  max_tokens: 2048
 
 # Auxiliary model for E2's two-stage retrieval (query expansion + rerank).
-# Cheap + fast — we make many calls per question.
+# Also pinned to pre-2025 cutoff so it can't leak Jan 2025 event knowledge
+# through ranking decisions into E2's briefing.
 refiner_model:
-  provider: anthropic
-  id: claude-haiku-4-5-20251001
+  provider: google
+  id: gemini-2.0-flash-lite
   temperature: 0.0
   max_tokens: 512
 
 # Sampling strategy per question.
-samples_per_question: 10
+# Reduced from 10 → 5 to stay within Gemini budget (~$40 total across all 6 experiments).
+# Each CHRONOS-briefing call is ~28K input tokens; 5 samples × 103 Qs × 4 experiments dominates cost.
+samples_per_question: 5
 
 # CHRONOS retrieval parameters.
 chronos:
@@ -37,9 +46,16 @@ chronos:
 # E5 web search constraints.
 web_search:
   # All search results must be dated <= simulation_date.
-  # Enforce with both query-level date filters and post-hoc URL date filtering.
+  # Enforce with Tavily end_date AND post-hoc filtering. When strict, items
+  # with missing/unparseable published_date are DROPPED (closes leakage
+  # surface where undated pages could slip through).
   enforce_temporal_filter: true
+  # Ask Tavily for up to this many raw results…
   max_results_per_question: 20
+  # …then keep at most this many after date-filtering, to keep the prompt
+  # short enough that Gemini returns reliable structured output.
+  max_kept_results: 10
+  snippet_chars: 300
 
 # Scoring.
 scoring:

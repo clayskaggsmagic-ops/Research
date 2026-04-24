@@ -1,30 +1,36 @@
 """
-Web-search tool binding for E5 (Analyst + web search, answerability gate).
+Web-search helper for E5 (Analyst + web search, answerability gate).
 
-Uses Anthropic's server-side web search tool, but requires the caller to
-enforce a temporal upper bound equal to the question's simulation_date.
+Implementations:
+  1. Anthropic server-side web_search tool (original).
+  2. Gemini google_search built-in grounding — NOT wired via bind_tools (langchain-google-genai
+     rejects built-in tool dicts); call Gemini directly if you want this.
+  3. Tavily pre-retrieval (default for Gemini runs): call Tavily with a date-bounded
+     query, format top results as a search-context block, and hand that to the model
+     as part of the user prompt. Deterministic, no tool-calling required.
 
 Enforcement is two-layered, because search APIs are imperfect:
   1. In-prompt: the system injects "Only use results dated on-or-before
-     {simulation_date}" into the analyst system prompt.
-  2. Post-hoc: if the model cites URLs, we (optionally) check the page's
-     publish date and drop cites that post-date the simulation.
-
-This module exposes `web_search_tool_spec(simulation_date)` which returns the
-tool definition to pass into `ChatAnthropic.bind_tools(...)` and an
-augmented-system-prompt wrapper.
+     {simulation_date}".
+  2. Post-hoc: if Tavily returns a `published_date`, we filter results whose date
+     is after the simulation_date.
 """
 
 from __future__ import annotations
 
-from datetime import date
+import os
+from datetime import date, datetime
+from typing import Any
 
 
 WEB_SEARCH_TOOL_TYPE = "web_search_20250305"
 
 
-def web_search_tool_spec(max_uses: int = 5) -> dict:
-    """Anthropic server-side web search tool spec."""
+def web_search_tool_spec(max_uses: int = 5, provider: str = "anthropic") -> dict | None:
+    """Returns a tool spec for model-side tool use. For Gemini runs we return
+    None — E5 uses Tavily pre-retrieval instead (see `tavily_search_context`)."""
+    if provider == "google":
+        return None
     return {
         "type": WEB_SEARCH_TOOL_TYPE,
         "name": "web_search",
@@ -41,3 +47,108 @@ def augment_system_with_temporal_constraint(system_text: str, simulation_date: s
         "as unseen and do not use it in your analysis.\n\n"
     )
     return preamble + system_text
+
+
+# ── Tavily pre-retrieval ──────────────────────────────────────────────────────
+
+
+def _parse_date(val: Any) -> date | None:
+    if not val:
+        return None
+    if isinstance(val, date) and not isinstance(val, datetime):
+        return val
+    try:
+        # Tavily usually returns ISO-like strings; be permissive.
+        if isinstance(val, str):
+            return datetime.fromisoformat(val.replace("Z", "+00:00")).date()
+    except Exception:
+        pass
+    return None
+
+
+def tavily_search_context(
+    query: str,
+    simulation_date: date,
+    max_results: int = 10,
+    strict_date_filter: bool = True,
+    max_kept: int = 10,
+    snippet_chars: int = 300,
+) -> str:
+    """Run a date-bounded Tavily search and return a formatted context block.
+
+    Temporal enforcement (strict_date_filter=True, default):
+      - Tavily is asked with end_date=simulation_date.
+      - Post-hoc, items are DROPPED if `published_date` is missing, unparseable,
+        or after simulation_date. This closes the leakage surface where
+        un-dated pages (news homepages, updated articles) could otherwise
+        slip through.
+
+    Returns an empty string (caller should handle gracefully) if Tavily isn't
+    configured or the call fails.
+    """
+    api_key = os.environ.get("TAVILY_API_KEY")
+    if not api_key:
+        return ""
+
+    # Lazy import so the module stays importable without the dep.
+    try:
+        import requests  # type: ignore
+    except ImportError:
+        return ""
+
+    payload = {
+        "api_key": api_key,
+        "query": query,
+        "max_results": max_results,
+        "search_depth": "advanced",
+        "include_raw_content": False,
+        "end_date": simulation_date.isoformat(),
+    }
+    try:
+        r = requests.post("https://api.tavily.com/search", json=payload, timeout=30)
+        r.raise_for_status()
+        data = r.json()
+    except Exception as e:
+        return f"(web_search unavailable: {type(e).__name__}: {e})"
+
+    results = data.get("results", []) or []
+    kept = []
+    dropped_nodate = 0
+    dropped_postsim = 0
+    for item in results:
+        pd = _parse_date(item.get("published_date"))
+        if pd is None:
+            if strict_date_filter:
+                dropped_nodate += 1
+                continue
+        elif pd > simulation_date:
+            dropped_postsim += 1
+            continue
+        kept.append(item)
+        if len(kept) >= max_kept:
+            break
+
+    if not kept:
+        return (
+            f"(web_search returned no results dated on-or-before {simulation_date.isoformat()}; "
+            f"dropped {dropped_nodate} undated, {dropped_postsim} post-sim-date)"
+        )
+
+    header = (
+        f"WEB SEARCH RESULTS (date ≤ {simulation_date.isoformat()}; "
+        f"strict_date_filter={strict_date_filter}; "
+        f"kept={len(kept)}, dropped_undated={dropped_nodate}, dropped_post_sim={dropped_postsim}):"
+    )
+    lines = [header, ""]
+    for i, item in enumerate(kept, 1):
+        title = item.get("title", "").strip()
+        url = item.get("url", "")
+        pd = item.get("published_date", "") or "unknown"
+        content = (item.get("content") or "").strip()
+        if len(content) > snippet_chars:
+            content = content[:snippet_chars] + "…"
+        lines.append(f"[{i}] {title}")
+        lines.append(f"    date: {pd}   url: {url}")
+        lines.append(f"    {content}")
+        lines.append("")
+    return "\n".join(lines).rstrip()

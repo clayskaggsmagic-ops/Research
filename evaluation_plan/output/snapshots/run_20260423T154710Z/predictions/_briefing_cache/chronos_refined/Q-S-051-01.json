@@ -1,0 +1,14 @@
+{
+  "text": "REFINED BRIEFING \u2014 no qualifying events retrieved.\nRetrieval hints: actors=['Office of Management and Budget', 'Associated Press', 'Reuters', 'President Trump', 'House of Representatives', 'Senate'], topics=['government shutdown', 'appropriations', 'continuing resolution', 'federal budget', 'homeland security'].",
+  "hash": "b7d5a202060f3466",
+  "meta": {
+    "variant": "chronos_refined",
+    "refiner_model_id": "gemini-2.5-flash-lite",
+    "over_retrieve_k": 50,
+    "keep_range": [
+      8,
+      12
+    ],
+    "model_id": "gemini-2.5-flash"
+  }
+}
