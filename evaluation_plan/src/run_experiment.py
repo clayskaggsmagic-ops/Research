@@ -109,6 +109,16 @@ def build_experiment_spec(
             "system_prompt_name": "analyst_system.md",
             "briefing_provider": NoBriefing(),
             "uses_web_search": True,
+            "answerability_gate": False,
+        },
+        "e6": {
+            # Answerability gate: full web search with NO date filter and NO
+            # temporal prompt constraint. If the model can't hit near 100% here,
+            # the question is degenerate (unanswerable even with hindsight).
+            "system_prompt_name": "analyst_system.md",
+            "briefing_provider": NoBriefing(),
+            "uses_web_search": True,
+            "answerability_gate": True,
         },
     }
     if experiment_id not in specs:
@@ -149,6 +159,7 @@ def run(
     spec = build_experiment_spec(experiment_id, cfg)
     briefing: BriefingProvider = spec["briefing_provider"]
     uses_web_search = spec["uses_web_search"]
+    answerability_gate = spec.get("answerability_gate", False)
 
     manifest = load_manifest(cfg["paths"]["manifest"])
     scorable = _scorable_qids(repo_path(cfg["paths"]["resolutions"]))
@@ -201,11 +212,17 @@ def run(
         if uses_web_search and provider == "google" and not dry_run:
             from datetime import date as _date
             ws_cfg = cfg["web_search"]
+            if answerability_gate:
+                sim_date_arg = None
+                strict = False
+            else:
+                sim_date_arg = _date.fromisoformat(q["simulation_date"])
+                strict = ws_cfg.get("enforce_temporal_filter", True)
             search_ctx = tavily_search_context(
                 query=q["question_text"],
-                simulation_date=_date.fromisoformat(q["simulation_date"]),
+                simulation_date=sim_date_arg,
                 max_results=ws_cfg.get("max_results_per_question", 20),
-                strict_date_filter=ws_cfg.get("enforce_temporal_filter", True),
+                strict_date_filter=strict,
                 max_kept=ws_cfg.get("max_kept_results", 10),
                 snippet_chars=ws_cfg.get("snippet_chars", 300),
             )
@@ -216,7 +233,7 @@ def run(
 
         system_name = spec["system_prompt_name"]
         system_text, user_text, prompt_hash = render_messages(q, system_name, brief_text)
-        if uses_web_search:
+        if uses_web_search and not answerability_gate:
             system_text = augment_system_with_temporal_constraint(system_text, q["simulation_date"])
 
         for i in range(n_samples):
@@ -281,7 +298,7 @@ def run(
 
 def _main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--experiment", required=True, choices=["e1", "e1p", "e2", "e3", "e4", "e5"])
+    ap.add_argument("--experiment", required=True, choices=["e1", "e1p", "e2", "e3", "e4", "e5", "e6"])
     ap.add_argument("--config", default="evaluation_plan/config.yaml")
     ap.add_argument("--out", default=None)
     ap.add_argument("--limit", type=int, default=None, help="Limit to first N questions (smoke test)")

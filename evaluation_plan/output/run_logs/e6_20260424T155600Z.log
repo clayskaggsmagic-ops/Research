@@ -1,0 +1,9 @@
+e6 answerability gate run started Fri Apr 24 15:56:00 UTC 2026 pid=12767
+--- e6 end Fri Apr 24 16:07:44 UTC 2026 rc=0 ---
+  [e6] [e6]   490/515 done (1.6 calls/s)
+  [e6] [e6]   500/515 done (1.6 calls/s)
+  [e6] [e6]   510/515 done (1.6 calls/s)
+  [e6] [e6]   515/515 done (1.6 calls/s)
+  [e6] [e6] done. calls=515 skipped=0 elapsed=325.7s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e6/predictions.jsonl
+  e6:      515 records (0 errors)
+e6 done Fri Apr 24 16:07:44 UTC 2026

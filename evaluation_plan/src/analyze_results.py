@@ -31,14 +31,15 @@ MANIFEST_PATH = ROOT / "evaluation_plan/output/final_manifest.json"
 OUT_DIR = ROOT / "evaluation_plan/output/analysis"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-EXPERIMENTS = ["e1", "e1p", "e2", "e3", "e4", "e5"]
+EXPERIMENTS = ["e1", "e1p", "e2", "e3", "e4", "e5", "e6"]
 EXP_LABELS = {
     "e1":  "Trump × CHRONOS broad-15",
     "e1p": "Trump × CHRONOS broad-8 (compressed)",
     "e2":  "Trump × CHRONOS refined (2-stage)",
     "e3":  "Trump × no briefing",
     "e4":  "Analyst × CHRONOS broad-15",
-    "e5":  "Analyst × Tavily web search",
+    "e5":  "Analyst × Tavily web search (date-bounded, strict)",
+    "e6":  "Analyst × Tavily web search (answerability gate, unbounded)",
 }
 
 # ── Load truth + manifest ────────────────────────────────────────────────────
@@ -250,6 +251,9 @@ def build_report():
         "compression (e1 vs e1p)": paired("e1", "e1p"),
         "web_vs_curated (e4 vs e5)": paired("e4", "e5"),
         "trump_persona_on_web (e5 vs e3)": paired("e5", "e3"),
+        "gate_vs_bounded_web (e6 vs e5)": paired("e6", "e5"),
+        "gate_vs_no_briefing (e6 vs e3)": paired("e6", "e3"),
+        "gate_vs_best_chronos (e6 vs e2)": paired("e6", "e2"),
     }
 
     # Sample-level variance (intra-question stdev of p-on-correct)
@@ -280,6 +284,9 @@ def build_report():
         "e5_attrition": {
             "missing_qids_entirely": sorted(set(all_qids) - set(brier_by_exp["e5"].keys())),
         },
+        "e6_attrition": {
+            "missing_qids_entirely": sorted(set(all_qids) - set(brier_by_exp["e6"].keys())),
+        },
     }
     return report
 
@@ -291,7 +298,7 @@ def to_md(report: dict) -> str:
     lines = []
     lines.append("# Experiment Results Summary\n")
     lines.append(f"Scorable questions: {report['config']['n_scorable_qids']}")
-    lines.append(f"Common qids across all 6 experiments (for fair comparison): "
+    lines.append(f"Common qids across all 7 experiments (for fair comparison): "
                  f"{report['config']['n_common_qids_for_fair_comparison']}\n")
 
     lines.append("## Record counts and errors")
@@ -311,7 +318,7 @@ def to_md(report: dict) -> str:
         mp = f"{c['mean_p_correct']:.4f}" if c["mean_p_correct"] is not None else "—"
         lines.append(f"| {e} | {c['n_questions']} | {mb} | {mp} |")
 
-    lines.append("\n## Fair comparison (restricted to common qids across all 6 experiments)")
+    lines.append("\n## Fair comparison (restricted to common qids across all 7 experiments)")
     lines.append("| exp | n_qids | mean Brier | mean p(correct) |")
     lines.append("|---|---:|---:|---:|")
     for e in EXPERIMENTS:

@@ -1,0 +1,14 @@
+[e5] model=gemini-2.0-flash-lite questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl dry_run=False
+[e5] dispatching 106 calls across 3 worker threads
+[e5]   10/106 done (0.5 calls/s)
+[e5]   20/106 done (0.8 calls/s)
+[e5]   30/106 done (0.8 calls/s)
+[e5]   40/106 done (0.7 calls/s)
+[e5]   50/106 done (0.8 calls/s)
+[e5]   60/106 done (0.9 calls/s)
+[e5]   70/106 done (0.8 calls/s)
+[e5]   80/106 done (0.8 calls/s)
+[e5]   90/106 done (0.8 calls/s)
+[e5]   100/106 done (0.8 calls/s)
+[e5]   106/106 done (0.8 calls/s)
+[e5] done. calls=106 skipped=409 elapsed=129.7s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl

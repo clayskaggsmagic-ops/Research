@@ -1,0 +1,4 @@
+[e2] model=gemini-2.0-flash-lite questions=103 samples=5 out=/Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl dry_run=False
+[e2] dispatching 7 calls across 1 worker threads
+[e2]   7/7 done (0.3 calls/s)
+[e2] done. calls=7 skipped=508 elapsed=26.9s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl

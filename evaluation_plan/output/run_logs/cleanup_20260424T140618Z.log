@@ -1,0 +1,14 @@
+cleanup run started Fri Apr 24 14:06:18 UTC 2026 pid=2288
+--- [e2] start Fri Apr 24 14:06:18 UTC 2026 ---
+--- [e2] end Fri Apr 24 14:46:31 UTC 2026 rc=0 ---
+  [e2] [e2]   110/118 done (0.0 calls/s)
+  [e2] [e2]   118/118 done (0.0 calls/s)
+  [e2] [e2] done. calls=118 skipped=397 elapsed=2412.6s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e2/predictions.jsonl
+--- [e5] start Fri Apr 24 14:46:31 UTC 2026 ---
+--- [e5] end Fri Apr 24 14:55:10 UTC 2026 rc=0 ---
+  [e5] [e5]   100/106 done (0.8 calls/s)
+  [e5] [e5]   106/106 done (0.8 calls/s)
+  [e5] [e5] done. calls=106 skipped=409 elapsed=129.7s → /Users/clayskaggs/Developer/Research/pipeline/output/predictions/e5/predictions.jsonl
+cleanup run done Fri Apr 24 14:55:10 UTC 2026
+  e2:      515 records (7 errors)
+  e5:      515 records (0 errors)

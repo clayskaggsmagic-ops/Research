@@ -6,10 +6,11 @@
       "e2": "Trump \u00d7 CHRONOS refined (2-stage)",
       "e3": "Trump \u00d7 no briefing",
       "e4": "Analyst \u00d7 CHRONOS broad-15",
-      "e5": "Analyst \u00d7 Tavily web search"
+      "e5": "Analyst \u00d7 Tavily web search (date-bounded, strict)",
+      "e6": "Analyst \u00d7 Tavily web search (answerability gate, unbounded)"
     },
     "n_scorable_qids": 103,
-    "n_common_qids_for_fair_comparison": 88
+    "n_common_qids_for_fair_comparison": 103
   },
   "counts": {
     "e1": {
@@ -34,226 +35,265 @@
     },
     "e4": {
       "total": 515,
-      "errors": 1,
-      "ok": 514
+      "errors": 0,
+      "ok": 515
     },
     "e5": {
       "total": 515,
-      "errors": 123,
-      "ok": 392
+      "errors": 0,
+      "ok": 515
+    },
+    "e6": {
+      "total": 515,
+      "errors": 0,
+      "ok": 515
     }
   },
   "tokens": {
     "e1": {
-      "in": 10317240,
-      "out": 73010
+      "in": 12673555,
+      "out": 74802
     },
     "e1p": {
-      "in": 6208970,
-      "out": 71542
+      "in": 7523555,
+      "out": 73724
     },
     "e2": {
-      "in": 1252595,
-      "out": 70956
+      "in": 1525011,
+      "out": 69481
     },
     "e3": {
-      "in": 659050,
-      "out": 69389
+      "in": 668030,
+      "out": 67869
     },
     "e4": {
-      "in": 11373489,
-      "out": 99678
+      "in": 12772424,
+      "out": 88651
     },
     "e5": {
-      "in": 2033852,
-      "out": 81285
+      "in": 723336,
+      "out": 77675
+    },
+    "e6": {
+      "in": 1279478,
+      "out": 83743
     }
   },
   "complete_case_analysis": {
     "e1": {
       "n_questions": 103,
-      "mean_brier": 0.5171559223300971,
-      "mean_p_correct": 0.4621359223300971
+      "mean_brier": 0.4774454368932039,
+      "mean_p_correct": 0.4275728155339806
     },
     "e1p": {
       "n_questions": 103,
-      "mean_brier": 0.5366646601941748,
-      "mean_p_correct": 0.4464077669902913
+      "mean_brier": 0.4834693203883495,
+      "mean_p_correct": 0.42194174757281555
     },
     "e2": {
       "n_questions": 103,
-      "mean_brier": 0.51868,
-      "mean_p_correct": 0.4583592233009709
+      "mean_brier": 0.4723415533980583,
+      "mean_p_correct": 0.42963106796116507
     },
     "e3": {
       "n_questions": 103,
-      "mean_brier": 0.5356449514563106,
-      "mean_p_correct": 0.44133980582524274
+      "mean_brier": 0.4803642718446602,
+      "mean_p_correct": 0.4170873786407767
     },
     "e4": {
       "n_questions": 103,
-      "mean_brier": 0.48068157186188676,
-      "mean_p_correct": 0.47049908680188407
+      "mean_brier": 0.48084291262135925,
+      "mean_p_correct": 0.42535922330097087
     },
     "e5": {
-      "n_questions": 88,
-      "mean_brier": 0.4408617215909091,
-      "mean_p_correct": 0.5749507575757575
+      "n_questions": 103,
+      "mean_brier": 0.4863312621359223,
+      "mean_p_correct": 0.40541747572815534
+    },
+    "e6": {
+      "n_questions": 103,
+      "mean_brier": 0.45184174757281553,
+      "mean_p_correct": 0.46089320388349514
     }
   },
   "available_case_analysis_common_qids_only": {
     "e1": {
-      "n_questions": 88,
-      "mean_brier": 0.5113802272727273,
-      "mean_p_correct": 0.46693181818181817
+      "n_questions": 103,
+      "mean_brier": 0.4774454368932039,
+      "mean_p_correct": 0.4275728155339806
     },
     "e1p": {
-      "n_questions": 88,
-      "mean_brier": 0.5332222727272727,
-      "mean_p_correct": 0.44975
+      "n_questions": 103,
+      "mean_brier": 0.4834693203883495,
+      "mean_p_correct": 0.42194174757281555
     },
     "e2": {
-      "n_questions": 88,
-      "mean_brier": 0.5207914772727272,
-      "mean_p_correct": 0.45789772727272726
+      "n_questions": 103,
+      "mean_brier": 0.4723415533980583,
+      "mean_p_correct": 0.42963106796116507
     },
     "e3": {
-      "n_questions": 88,
-      "mean_brier": 0.5376751136363637,
-      "mean_p_correct": 0.44229545454545455
+      "n_questions": 103,
+      "mean_brier": 0.4803642718446602,
+      "mean_p_correct": 0.4170873786407767
     },
     "e4": {
-      "n_questions": 88,
-      "mean_brier": 0.4829658170656174,
-      "mean_p_correct": 0.4681296129612961
+      "n_questions": 103,
+      "mean_brier": 0.48084291262135925,
+      "mean_p_correct": 0.42535922330097087
     },
     "e5": {
-      "n_questions": 88,
-      "mean_brier": 0.4408617215909091,
-      "mean_p_correct": 0.5749507575757575
+      "n_questions": 103,
+      "mean_brier": 0.4863312621359223,
+      "mean_p_correct": 0.40541747572815534
+    },
+    "e6": {
+      "n_questions": 103,
+      "mean_brier": 0.45184174757281553,
+      "mean_p_correct": 0.46089320388349514
     }
   },
   "by_question_format_common": {
     "e1": {
       "binary": {
-        "n": 50,
-        "mean_brier": 0.3138884
+        "n": 58,
+        "mean_brier": 0.24567241379310345
       },
       "action": {
-        "n": 38,
-        "mean_brier": 0.7712378947368421
+        "n": 45,
+        "mean_brier": 0.7761751111111111
       }
     },
     "e1p": {
       "binary": {
-        "n": 50,
-        "mean_brier": 0.3342152
+        "n": 58,
+        "mean_brier": 0.2522844827586207
       },
       "action": {
-        "n": 38,
-        "mean_brier": 0.7950736842105263
+        "n": 45,
+        "mean_brier": 0.7814408888888889
       }
     },
     "e2": {
       "binary": {
-        "n": 50,
-        "mean_brier": 0.325538
+        "n": 58,
+        "mean_brier": 0.2716637931034483
       },
       "action": {
-        "n": 38,
-        "mean_brier": 0.7777039473684211
+        "n": 45,
+        "mean_brier": 0.7309928888888889
       }
     },
     "e3": {
       "binary": {
-        "n": 50,
-        "mean_brier": 0.323096
+        "n": 58,
+        "mean_brier": 0.2778793103448276
       },
       "action": {
-        "n": 38,
-        "mean_brier": 0.820016052631579
+        "n": 45,
+        "mean_brier": 0.7413448888888889
       }
     },
     "e4": {
       "binary": {
-        "n": 50,
-        "mean_brier": 0.2773692
+        "n": 58,
+        "mean_brier": 0.23696310344827587
       },
       "action": {
-        "n": 38,
-        "mean_brier": 0.7534876816256404
+        "n": 45,
+        "mean_brier": 0.7951768888888889
       }
     },
     "e5": {
       "binary": {
-        "n": 50,
-        "mean_brier": 0.21911873333333334
+        "n": 58,
+        "mean_brier": 0.24741379310344827
       },
       "action": {
-        "n": 38,
-        "mean_brier": 0.7326288114035088
+        "n": 45,
+        "mean_brier": 0.7942693333333334
+      }
+    },
+    "e6": {
+      "binary": {
+        "n": 58,
+        "mean_brier": 0.20320793103448276
+      },
+      "action": {
+        "n": 45,
+        "mean_brier": 0.7723031111111112
       }
     }
   },
   "by_difficulty_common": {
     "e1": {
       "medium": {
-        "n": 27,
-        "mean_brier": 0.7369037037037037
+        "n": 32,
+        "mean_brier": 0.7834387500000001
       },
       "hard": {
-        "n": 61,
-        "mean_brier": 0.4115583606557377
+        "n": 71,
+        "mean_brier": 0.33953295774647885
       }
     },
     "e1p": {
       "medium": {
-        "n": 27,
-        "mean_brier": 0.78276
+        "n": 32,
+        "mean_brier": 0.7916875
       },
       "hard": {
-        "n": 61,
-        "mean_brier": 0.4227711475409836
+        "n": 71,
+        "mean_brier": 0.3445540845070423
       }
     },
     "e2": {
       "medium": {
-        "n": 27,
-        "mean_brier": 0.7760885185185186
+        "n": 32,
+        "mean_brier": 0.7464475
       },
       "hard": {
-        "n": 61,
-        "mean_brier": 0.4077911475409836
+        "n": 71,
+        "mean_brier": 0.3488008450704225
       }
     },
     "e3": {
       "medium": {
-        "n": 27,
-        "mean_brier": 0.8208051851851852
+        "n": 32,
+        "mean_brier": 0.74386
       },
       "hard": {
-        "n": 61,
-        "mean_brier": 0.41235524590163936
+        "n": 71,
+        "mean_brier": 0.3616056338028169
       }
     },
     "e4": {
       "medium": {
-        "n": 27,
-        "mean_brier": 0.7387051851851851
+        "n": 32,
+        "mean_brier": 0.78896875
       },
       "hard": {
-        "n": 61,
-        "mean_brier": 0.369769703307776
+        "n": 71,
+        "mean_brier": 0.3419692957746479
       }
     },
     "e5": {
       "medium": {
-        "n": 27,
-        "mean_brier": 0.7204974629629629
+        "n": 32,
+        "mean_brier": 0.796375
       },
       "hard": {
-        "n": 61,
-        "mean_brier": 0.3170885245901639
+        "n": 71,
+        "mean_brier": 0.34659323943661974
+      }
+    },
+    "e6": {
+      "medium": {
+        "n": 32,
+        "mean_brier": 0.7522562500000001
+      },
+      "hard": {
+        "n": 71,
+        "mean_brier": 0.316443661971831
       }
     }
   },
@@ -261,283 +301,329 @@
     "e1": {
       "trade_tariffs": {
         "n": 24,
-        "mean_brier": 0.503105
+        "mean_brier": 0.4636808333333334
       },
       "executive_orders": {
-        "n": 18,
-        "mean_brier": 0.5654677777777778
+        "n": 19,
+        "mean_brier": 0.5075
       },
       "personnel": {
-        "n": 6,
-        "mean_brier": 0.40573
+        "n": 14,
+        "mean_brier": 0.42446428571428574
       },
       "foreign_policy": {
-        "n": 12,
-        "mean_brier": 0.6280033333333332
+        "n": 18,
+        "mean_brier": 0.4445466666666667
       },
       "legislative": {
         "n": 11,
-        "mean_brier": 0.47811272727272724
+        "mean_brier": 0.5509272727272727
       },
       "public_comms": {
         "n": 9,
-        "mean_brier": 0.3831022222222222
+        "mean_brier": 0.5012777777777778
       },
       "legal_judicial": {
         "n": 8,
-        "mean_brier": 0.5088675
+        "mean_brier": 0.48625
       }
     },
     "e1p": {
       "trade_tariffs": {
         "n": 24,
-        "mean_brier": 0.5359716666666666
+        "mean_brier": 0.4638125
       },
       "executive_orders": {
-        "n": 18,
-        "mean_brier": 0.5785622222222222
+        "n": 19,
+        "mean_brier": 0.5206578947368421
       },
       "personnel": {
-        "n": 6,
-        "mean_brier": 0.432
+        "n": 14,
+        "mean_brier": 0.4293214285714286
       },
       "foreign_policy": {
-        "n": 12,
-        "mean_brier": 0.6027483333333333
+        "n": 18,
+        "mean_brier": 0.44715777777777777
       },
       "legislative": {
         "n": 11,
-        "mean_brier": 0.5466163636363637
+        "mean_brier": 0.5430454545454546
       },
       "public_comms": {
         "n": 9,
-        "mean_brier": 0.3874444444444444
+        "mean_brier": 0.5290555555555556
       },
       "legal_judicial": {
         "n": 8,
-        "mean_brier": 0.5401699999999999
+        "mean_brier": 0.497375
       }
     },
     "e2": {
       "trade_tariffs": {
         "n": 24,
-        "mean_brier": 0.5099295833333334
+        "mean_brier": 0.46605083333333336
       },
       "executive_orders": {
-        "n": 18,
-        "mean_brier": 0.5838488888888889
+        "n": 19,
+        "mean_brier": 0.5236052631578947
       },
       "personnel": {
-        "n": 6,
-        "mean_brier": 0.39025
+        "n": 14,
+        "mean_brier": 0.39839285714285716
       },
       "foreign_policy": {
-        "n": 12,
-        "mean_brier": 0.6314799999999999
+        "n": 18,
+        "mean_brier": 0.4381388888888889
       },
       "legislative": {
         "n": 11,
-        "mean_brier": 0.5137636363636363
+        "mean_brier": 0.5198727272727273
       },
       "public_comms": {
         "n": 9,
-        "mean_brier": 0.34936
+        "mean_brier": 0.4444288888888889
       },
       "legal_judicial": {
         "n": 8,
-        "mean_brier": 0.545895
+        "mean_brier": 0.541875
       }
     },
     "e3": {
       "trade_tariffs": {
         "n": 24,
-        "mean_brier": 0.5690975
+        "mean_brier": 0.47810416666666666
       },
       "executive_orders": {
-        "n": 18,
-        "mean_brier": 0.5650516666666666
+        "n": 19,
+        "mean_brier": 0.4777105263157895
       },
       "personnel": {
-        "n": 6,
-        "mean_brier": 0.49198
+        "n": 14,
+        "mean_brier": 0.47067857142857145
       },
       "foreign_policy": {
-        "n": 12,
-        "mean_brier": 0.63229
+        "n": 18,
+        "mean_brier": 0.4881666666666667
       },
       "legislative": {
         "n": 11,
-        "mean_brier": 0.5316972727272727
+        "mean_brier": 0.5429563636363637
       },
       "public_comms": {
         "n": 9,
-        "mean_brier": 0.3396311111111111
+        "mean_brier": 0.41994444444444445
       },
       "legal_judicial": {
         "n": 8,
-        "mean_brier": 0.50517875
+        "mean_brier": 0.47475
       }
     },
     "e4": {
       "trade_tariffs": {
         "n": 24,
-        "mean_brier": 0.47201333333333334
+        "mean_brier": 0.43352083333333336
       },
       "executive_orders": {
-        "n": 18,
-        "mean_brier": 0.5009162167652409
+        "n": 19,
+        "mean_brier": 0.5555263157894736
       },
       "personnel": {
-        "n": 6,
-        "mean_brier": 0.4624033333333333
+        "n": 14,
+        "mean_brier": 0.459
       },
       "foreign_policy": {
-        "n": 12,
-        "mean_brier": 0.5099916666666666
+        "n": 18,
+        "mean_brier": 0.45644222222222225
       },
       "legislative": {
         "n": 11,
-        "mean_brier": 0.4421918181818182
+        "mean_brier": 0.5415454545454546
       },
       "public_comms": {
         "n": 9,
-        "mean_brier": 0.5084533333333333
+        "mean_brier": 0.5375000000000001
       },
       "legal_judicial": {
         "n": 8,
-        "mean_brier": 0.47770875
+        "mean_brier": 0.3913575
       }
     },
     "e5": {
       "trade_tariffs": {
         "n": 24,
-        "mean_brier": 0.4304047916666667
+        "mean_brier": 0.4745416666666667
       },
       "executive_orders": {
-        "n": 18,
-        "mean_brier": 0.4838857407407407
+        "n": 19,
+        "mean_brier": 0.5531842105263158
       },
       "personnel": {
-        "n": 6,
-        "mean_brier": 0.30751358333333334
+        "n": 14,
+        "mean_brier": 0.43939285714285714
       },
       "foreign_policy": {
-        "n": 12,
-        "mean_brier": 0.5156108333333334
+        "n": 18,
+        "mean_brier": 0.44736777777777775
       },
       "legislative": {
         "n": 11,
-        "mean_brier": 0.44917045454545457
+        "mean_brier": 0.5122727272727273
       },
       "public_comms": {
         "n": 9,
-        "mean_brier": 0.5315262962962962
+        "mean_brier": 0.5663888888888889
       },
       "legal_judicial": {
         "n": 8,
-        "mean_brier": 0.24989375
+        "mean_brier": 0.407
+      }
+    },
+    "e6": {
+      "trade_tariffs": {
+        "n": 24,
+        "mean_brier": 0.4310625
+      },
+      "executive_orders": {
+        "n": 19,
+        "mean_brier": 0.4998684210526316
+      },
+      "personnel": {
+        "n": 14,
+        "mean_brier": 0.39346857142857145
+      },
+      "foreign_policy": {
+        "n": 18,
+        "mean_brier": 0.4433611111111111
+      },
+      "legislative": {
+        "n": 11,
+        "mean_brier": 0.5185181818181819
+      },
+      "public_comms": {
+        "n": 9,
+        "mean_brier": 0.5654933333333333
+      },
+      "legal_judicial": {
+        "n": 8,
+        "mean_brier": 0.30181250000000004
       }
     }
   },
   "paired_deltas_common": {
     "persona (e1 vs e4, same briefing)": {
-      "mean_delta": 0.02841441020710981,
-      "median_delta": 0.0055,
-      "a_better_count": 41,
-      "b_better_count": 47,
-      "tie_count": 0,
-      "n": 88
+      "mean_delta": -0.003397475728155346,
+      "median_delta": 0.0,
+      "a_better_count": 50,
+      "b_better_count": 46,
+      "tie_count": 7,
+      "n": 103
     },
     "briefing_vs_none (e1 vs e3)": {
-      "mean_delta": -0.026294886363636378,
-      "median_delta": -0.0014999999999999983,
-      "a_better_count": 47,
-      "b_better_count": 39,
-      "tie_count": 2,
-      "n": 88
+      "mean_delta": -0.0029188349514563147,
+      "median_delta": 0.0,
+      "a_better_count": 45,
+      "b_better_count": 48,
+      "tie_count": 10,
+      "n": 103
     },
     "refinement (e1 vs e2)": {
-      "mean_delta": -0.009411250000000006,
-      "median_delta": 0.0010000000000000044,
-      "a_better_count": 40,
-      "b_better_count": 45,
-      "tie_count": 3,
-      "n": 88
+      "mean_delta": 0.005103883495145626,
+      "median_delta": 0.0,
+      "a_better_count": 41,
+      "b_better_count": 51,
+      "tie_count": 11,
+      "n": 103
     },
     "compression (e1 vs e1p)": {
-      "mean_delta": -0.02184204545454546,
+      "mean_delta": -0.006023883495145632,
       "median_delta": 0.0,
-      "a_better_count": 40,
-      "b_better_count": 43,
-      "tie_count": 5,
-      "n": 88
+      "a_better_count": 47,
+      "b_better_count": 40,
+      "tie_count": 16,
+      "n": 103
     },
     "web_vs_curated (e4 vs e5)": {
-      "mean_delta": 0.04210409547470837,
-      "median_delta": 0.030709999999999994,
-      "a_better_count": 37,
-      "b_better_count": 51,
-      "tie_count": 0,
-      "n": 88
+      "mean_delta": -0.0054883495145631005,
+      "median_delta": 0.0,
+      "a_better_count": 51,
+      "b_better_count": 45,
+      "tie_count": 7,
+      "n": 103
     },
     "trump_persona_on_web (e5 vs e3)": {
-      "mean_delta": -0.09681339204545455,
-      "median_delta": -0.0235,
-      "a_better_count": 56,
-      "b_better_count": 32,
-      "tie_count": 0,
-      "n": 88
+      "mean_delta": 0.00596699029126213,
+      "median_delta": 0.003500000000000003,
+      "a_better_count": 46,
+      "b_better_count": 54,
+      "tie_count": 3,
+      "n": 103
+    },
+    "gate_vs_bounded_web (e6 vs e5)": {
+      "mean_delta": -0.034489514563106796,
+      "median_delta": -0.023999999999999966,
+      "a_better_count": 60,
+      "b_better_count": 41,
+      "tie_count": 2,
+      "n": 103
+    },
+    "gate_vs_no_briefing (e6 vs e3)": {
+      "mean_delta": -0.028522524271844662,
+      "median_delta": -0.020560000000000134,
+      "a_better_count": 59,
+      "b_better_count": 38,
+      "tie_count": 6,
+      "n": 103
+    },
+    "gate_vs_best_chronos (e6 vs e2)": {
+      "mean_delta": -0.02049980582524272,
+      "median_delta": -0.016,
+      "a_better_count": 54,
+      "b_better_count": 44,
+      "tie_count": 5,
+      "n": 103
     }
   },
   "sample_variance": {
     "e1": {
       "n_questions_with_variance": 103,
-      "mean_intra_question_stdev": 0.06786489951491369,
-      "max_intra_question_stdev": 0.2712931993250107
+      "mean_intra_question_stdev": 0.032125884212121494,
+      "max_intra_question_stdev": 0.1356465996625054
     },
     "e1p": {
       "n_questions_with_variance": 103,
-      "mean_intra_question_stdev": 0.05790678635685597,
-      "max_intra_question_stdev": 0.2646204829562519
+      "mean_intra_question_stdev": 0.038203264011934863,
+      "max_intra_question_stdev": 0.1469693845669907
     },
     "e2": {
       "n_questions_with_variance": 103,
-      "mean_intra_question_stdev": 0.06417343143406455,
-      "max_intra_question_stdev": 0.33704599092705434
+      "mean_intra_question_stdev": 0.02582826709281891,
+      "max_intra_question_stdev": 0.1019803902718557
     },
     "e3": {
       "n_questions_with_variance": 103,
-      "mean_intra_question_stdev": 0.062421876727707305,
-      "max_intra_question_stdev": 0.28740215726399826
+      "mean_intra_question_stdev": 0.025131315656241035,
+      "max_intra_question_stdev": 0.10198039027185572
     },
     "e4": {
       "n_questions_with_variance": 103,
-      "mean_intra_question_stdev": 0.08596455240925738,
-      "max_intra_question_stdev": 0.31080540535840107
+      "mean_intra_question_stdev": 0.029348235128321094,
+      "max_intra_question_stdev": 0.1833030277982336
     },
     "e5": {
-      "n_questions_with_variance": 86,
-      "mean_intra_question_stdev": 0.1273355690925937,
-      "max_intra_question_stdev": 0.4242640687119285
+      "n_questions_with_variance": 103,
+      "mean_intra_question_stdev": 0.02276138324077563,
+      "max_intra_question_stdev": 0.09797958971132713
+    },
+    "e6": {
+      "n_questions_with_variance": 103,
+      "mean_intra_question_stdev": 0.032455908839301405,
+      "max_intra_question_stdev": 0.39230600301295415
     }
   },
   "e5_attrition": {
-    "missing_qids_entirely": [
-      "Q-S-026-03",
-      "Q-S-032-02",
-      "Q-S-034-03",
-      "Q-S-035-01",
-      "Q-S-036-01",
-      "Q-S-037-01",
-      "Q-S-037-03",
-      "Q-S-038-01",
-      "Q-S-038-02",
-      "Q-S-039-01",
-      "Q-S-039-02",
-      "Q-S-040-01",
-      "Q-S-040-02",
-      "Q-S-041-01",
-      "Q-S-041-02"
-    ]
+    "missing_qids_entirely": []
+  },
+  "e6_attrition": {
+    "missing_qids_entirely": []
   }
 }

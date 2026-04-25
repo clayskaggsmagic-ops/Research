@@ -68,20 +68,24 @@ def _parse_date(val: Any) -> date | None:
 
 def tavily_search_context(
     query: str,
-    simulation_date: date,
+    simulation_date: date | None,
     max_results: int = 10,
     strict_date_filter: bool = True,
     max_kept: int = 10,
     snippet_chars: int = 300,
 ) -> str:
-    """Run a date-bounded Tavily search and return a formatted context block.
+    """Run a Tavily search and return a formatted context block.
 
-    Temporal enforcement (strict_date_filter=True, default):
-      - Tavily is asked with end_date=simulation_date.
-      - Post-hoc, items are DROPPED if `published_date` is missing, unparseable,
-        or after simulation_date. This closes the leakage surface where
-        un-dated pages (news homepages, updated articles) could otherwise
-        slip through.
+    Two modes:
+      - Date-bounded (simulation_date set, strict_date_filter=True): asks Tavily
+        with end_date=simulation_date and post-hoc drops items whose
+        published_date is missing, unparseable, or after simulation_date.
+        Tight leakage control but usually drops most results (Tavily rarely
+        populates published_date).
+      - Unbounded / answerability gate (simulation_date=None OR
+        strict_date_filter=False): no end_date, no post-hoc drop. Returns
+        everything Tavily gives us — including post-outcome coverage. Use this
+        to verify questions are answerable given full hindsight.
 
     Returns an empty string (caller should handle gracefully) if Tavily isn't
     configured or the call fails.
@@ -102,8 +106,9 @@ def tavily_search_context(
         "max_results": max_results,
         "search_depth": "advanced",
         "include_raw_content": False,
-        "end_date": simulation_date.isoformat(),
     }
+    if simulation_date is not None and strict_date_filter:
+        payload["end_date"] = simulation_date.isoformat()
     try:
         r = requests.post("https://api.tavily.com/search", json=payload, timeout=30)
         r.raise_for_status()
@@ -116,11 +121,15 @@ def tavily_search_context(
     dropped_nodate = 0
     dropped_postsim = 0
     for item in results:
+        if simulation_date is None or not strict_date_filter:
+            kept.append(item)
+            if len(kept) >= max_kept:
+                break
+            continue
         pd = _parse_date(item.get("published_date"))
         if pd is None:
-            if strict_date_filter:
-                dropped_nodate += 1
-                continue
+            dropped_nodate += 1
+            continue
         elif pd > simulation_date:
             dropped_postsim += 1
             continue
@@ -129,16 +138,24 @@ def tavily_search_context(
             break
 
     if not kept:
+        if simulation_date is None or not strict_date_filter:
+            return "(web_search returned no results)"
         return (
             f"(web_search returned no results dated on-or-before {simulation_date.isoformat()}; "
             f"dropped {dropped_nodate} undated, {dropped_postsim} post-sim-date)"
         )
 
-    header = (
-        f"WEB SEARCH RESULTS (date ≤ {simulation_date.isoformat()}; "
-        f"strict_date_filter={strict_date_filter}; "
-        f"kept={len(kept)}, dropped_undated={dropped_nodate}, dropped_post_sim={dropped_postsim}):"
-    )
+    if simulation_date is None or not strict_date_filter:
+        header = (
+            f"WEB SEARCH RESULTS (unbounded; strict_date_filter={strict_date_filter}; "
+            f"kept={len(kept)}):"
+        )
+    else:
+        header = (
+            f"WEB SEARCH RESULTS (date ≤ {simulation_date.isoformat()}; "
+            f"strict_date_filter={strict_date_filter}; "
+            f"kept={len(kept)}, dropped_undated={dropped_nodate}, dropped_post_sim={dropped_postsim}):"
+        )
     lines = [header, ""]
     for i, item in enumerate(kept, 1):
         title = item.get("title", "").strip()

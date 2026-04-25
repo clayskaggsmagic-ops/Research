@@ -1,89 +1,98 @@
 # Experiment Results Summary
 
 Scorable questions: 103
-Common qids across all 6 experiments (for fair comparison): 88
+Common qids across all 7 experiments (for fair comparison): 103
 
 ## Record counts and errors
 | exp | label | total | ok | errors | tok_in | tok_out |
 |---|---|---:|---:|---:|---:|---:|
-| e1 | Trump × CHRONOS broad-15 | 515 | 515 | 0 | 10,317,240 | 73,010 |
-| e1p | Trump × CHRONOS broad-8 (compressed) | 515 | 515 | 0 | 6,208,970 | 71,542 |
-| e2 | Trump × CHRONOS refined (2-stage) | 515 | 515 | 0 | 1,252,595 | 70,956 |
-| e3 | Trump × no briefing | 515 | 515 | 0 | 659,050 | 69,389 |
-| e4 | Analyst × CHRONOS broad-15 | 515 | 514 | 1 | 11,373,489 | 99,678 |
-| e5 | Analyst × Tavily web search | 515 | 392 | 123 | 2,033,852 | 81,285 |
+| e1 | Trump × CHRONOS broad-15 | 515 | 515 | 0 | 12,673,555 | 74,802 |
+| e1p | Trump × CHRONOS broad-8 (compressed) | 515 | 515 | 0 | 7,523,555 | 73,724 |
+| e2 | Trump × CHRONOS refined (2-stage) | 515 | 515 | 0 | 1,525,011 | 69,481 |
+| e3 | Trump × no briefing | 515 | 515 | 0 | 668,030 | 67,869 |
+| e4 | Analyst × CHRONOS broad-15 | 515 | 515 | 0 | 12,772,424 | 88,651 |
+| e5 | Analyst × Tavily web search (date-bounded, strict) | 515 | 515 | 0 | 723,336 | 77,675 |
+| e6 | Analyst × Tavily web search (answerability gate, unbounded) | 515 | 515 | 0 | 1,279,478 | 83,743 |
 
 ## Complete-case analysis (per-exp, each experiment's own surviving qids)
 | exp | n_qids | mean Brier | mean p(correct) |
 |---|---:|---:|---:|
-| e1 | 103 | 0.5172 | 0.4621 |
-| e1p | 103 | 0.5367 | 0.4464 |
-| e2 | 103 | 0.5187 | 0.4584 |
-| e3 | 103 | 0.5356 | 0.4413 |
-| e4 | 103 | 0.4807 | 0.4705 |
-| e5 | 88 | 0.4409 | 0.5750 |
+| e1 | 103 | 0.4774 | 0.4276 |
+| e1p | 103 | 0.4835 | 0.4219 |
+| e2 | 103 | 0.4723 | 0.4296 |
+| e3 | 103 | 0.4804 | 0.4171 |
+| e4 | 103 | 0.4808 | 0.4254 |
+| e5 | 103 | 0.4863 | 0.4054 |
+| e6 | 103 | 0.4518 | 0.4609 |
 
-## Fair comparison (restricted to common qids across all 6 experiments)
+## Fair comparison (restricted to common qids across all 7 experiments)
 | exp | n_qids | mean Brier | mean p(correct) |
 |---|---:|---:|---:|
-| e1 | 88 | 0.5114 | 0.4669 |
-| e1p | 88 | 0.5332 | 0.4497 |
-| e2 | 88 | 0.5208 | 0.4579 |
-| e3 | 88 | 0.5377 | 0.4423 |
-| e4 | 88 | 0.4830 | 0.4681 |
-| e5 | 88 | 0.4409 | 0.5750 |
+| e1 | 103 | 0.4774 | 0.4276 |
+| e1p | 103 | 0.4835 | 0.4219 |
+| e2 | 103 | 0.4723 | 0.4296 |
+| e3 | 103 | 0.4804 | 0.4171 |
+| e4 | 103 | 0.4808 | 0.4254 |
+| e5 | 103 | 0.4863 | 0.4054 |
+| e6 | 103 | 0.4518 | 0.4609 |
 
 ## By question format (common qids only)
 | exp | binary n | binary Brier | action n | action Brier |
 |---|---:|---:|---:|---:|
-| e1 | 50 | 0.3139 | 38 | 0.7712 |
-| e1p | 50 | 0.3342 | 38 | 0.7951 |
-| e2 | 50 | 0.3255 | 38 | 0.7777 |
-| e3 | 50 | 0.3231 | 38 | 0.8200 |
-| e4 | 50 | 0.2774 | 38 | 0.7535 |
-| e5 | 50 | 0.2191 | 38 | 0.7326 |
+| e1 | 58 | 0.2457 | 45 | 0.7762 |
+| e1p | 58 | 0.2523 | 45 | 0.7814 |
+| e2 | 58 | 0.2717 | 45 | 0.7310 |
+| e3 | 58 | 0.2779 | 45 | 0.7413 |
+| e4 | 58 | 0.2370 | 45 | 0.7952 |
+| e5 | 58 | 0.2474 | 45 | 0.7943 |
+| e6 | 58 | 0.2032 | 45 | 0.7723 |
 
 ## By difficulty (common qids only)
 | exp | hard (n, Brier) | medium (n, Brier) |
 |---|---|---|
-| e1 | 61, 0.4116 | 27, 0.7369 |
-| e1p | 61, 0.4228 | 27, 0.7828 |
-| e2 | 61, 0.4078 | 27, 0.7761 |
-| e3 | 61, 0.4124 | 27, 0.8208 |
-| e4 | 61, 0.3698 | 27, 0.7387 |
-| e5 | 61, 0.3171 | 27, 0.7205 |
+| e1 | 71, 0.3395 | 32, 0.7834 |
+| e1p | 71, 0.3446 | 32, 0.7917 |
+| e2 | 71, 0.3488 | 32, 0.7464 |
+| e3 | 71, 0.3616 | 32, 0.7439 |
+| e4 | 71, 0.3420 | 32, 0.7890 |
+| e5 | 71, 0.3466 | 32, 0.7964 |
+| e6 | 71, 0.3164 | 32, 0.7523 |
 
 ## By domain (common qids only)
 | exp | executive_orders | foreign_policy | legal_judicial | legislative | personnel | public_comms | trade_tariffs |
 |---|---|---|---|---|---|---|---|
-| e1 | n=18, 0.5655 | n=12, 0.6280 | n=8, 0.5089 | n=11, 0.4781 | n=6, 0.4057 | n=9, 0.3831 | n=24, 0.5031 |
-| e1p | n=18, 0.5786 | n=12, 0.6027 | n=8, 0.5402 | n=11, 0.5466 | n=6, 0.4320 | n=9, 0.3874 | n=24, 0.5360 |
-| e2 | n=18, 0.5838 | n=12, 0.6315 | n=8, 0.5459 | n=11, 0.5138 | n=6, 0.3902 | n=9, 0.3494 | n=24, 0.5099 |
-| e3 | n=18, 0.5651 | n=12, 0.6323 | n=8, 0.5052 | n=11, 0.5317 | n=6, 0.4920 | n=9, 0.3396 | n=24, 0.5691 |
-| e4 | n=18, 0.5009 | n=12, 0.5100 | n=8, 0.4777 | n=11, 0.4422 | n=6, 0.4624 | n=9, 0.5085 | n=24, 0.4720 |
-| e5 | n=18, 0.4839 | n=12, 0.5156 | n=8, 0.2499 | n=11, 0.4492 | n=6, 0.3075 | n=9, 0.5315 | n=24, 0.4304 |
+| e1 | n=19, 0.5075 | n=18, 0.4445 | n=8, 0.4863 | n=11, 0.5509 | n=14, 0.4245 | n=9, 0.5013 | n=24, 0.4637 |
+| e1p | n=19, 0.5207 | n=18, 0.4472 | n=8, 0.4974 | n=11, 0.5430 | n=14, 0.4293 | n=9, 0.5291 | n=24, 0.4638 |
+| e2 | n=19, 0.5236 | n=18, 0.4381 | n=8, 0.5419 | n=11, 0.5199 | n=14, 0.3984 | n=9, 0.4444 | n=24, 0.4661 |
+| e3 | n=19, 0.4777 | n=18, 0.4882 | n=8, 0.4748 | n=11, 0.5430 | n=14, 0.4707 | n=9, 0.4199 | n=24, 0.4781 |
+| e4 | n=19, 0.5555 | n=18, 0.4564 | n=8, 0.3914 | n=11, 0.5415 | n=14, 0.4590 | n=9, 0.5375 | n=24, 0.4335 |
+| e5 | n=19, 0.5532 | n=18, 0.4474 | n=8, 0.4070 | n=11, 0.5123 | n=14, 0.4394 | n=9, 0.5664 | n=24, 0.4745 |
+| e6 | n=19, 0.4999 | n=18, 0.4434 | n=8, 0.3018 | n=11, 0.5185 | n=14, 0.3935 | n=9, 0.5655 | n=24, 0.4311 |
 
 ## Paired deltas (per-question Brier difference, common qids)
 Positive mean_delta means `a` is WORSE than `b` on that axis.
 | contrast | mean Δ | median Δ | a-better | b-better | ties | n |
 |---|---:|---:|---:|---:|---:|---:|
-| persona (e1 vs e4, same briefing) | +0.0284 | +0.0055 | 41 | 47 | 0 | 88 |
-| briefing_vs_none (e1 vs e3) | -0.0263 | -0.0015 | 47 | 39 | 2 | 88 |
-| refinement (e1 vs e2) | -0.0094 | +0.0010 | 40 | 45 | 3 | 88 |
-| compression (e1 vs e1p) | -0.0218 | +0.0000 | 40 | 43 | 5 | 88 |
-| web_vs_curated (e4 vs e5) | +0.0421 | +0.0307 | 37 | 51 | 0 | 88 |
-| trump_persona_on_web (e5 vs e3) | -0.0968 | -0.0235 | 56 | 32 | 0 | 88 |
+| persona (e1 vs e4, same briefing) | -0.0034 | +0.0000 | 50 | 46 | 7 | 103 |
+| briefing_vs_none (e1 vs e3) | -0.0029 | +0.0000 | 45 | 48 | 10 | 103 |
+| refinement (e1 vs e2) | +0.0051 | +0.0000 | 41 | 51 | 11 | 103 |
+| compression (e1 vs e1p) | -0.0060 | +0.0000 | 47 | 40 | 16 | 103 |
+| web_vs_curated (e4 vs e5) | -0.0055 | +0.0000 | 51 | 45 | 7 | 103 |
+| trump_persona_on_web (e5 vs e3) | +0.0060 | +0.0035 | 46 | 54 | 3 | 103 |
+| gate_vs_bounded_web (e6 vs e5) | -0.0345 | -0.0240 | 60 | 41 | 2 | 103 |
+| gate_vs_no_briefing (e6 vs e3) | -0.0285 | -0.0206 | 59 | 38 | 6 | 103 |
+| gate_vs_best_chronos (e6 vs e2) | -0.0205 | -0.0160 | 54 | 44 | 5 | 103 |
 
 ## Sample-level variance (mean intra-question stdev of p(correct))
 | exp | mean stdev | max stdev |
 |---|---:|---:|
-| e1 | 0.0679 | 0.2713 |
-| e1p | 0.0579 | 0.2646 |
-| e2 | 0.0642 | 0.3370 |
-| e3 | 0.0624 | 0.2874 |
-| e4 | 0.0860 | 0.3108 |
-| e5 | 0.1273 | 0.4243 |
+| e1 | 0.0321 | 0.1356 |
+| e1p | 0.0382 | 0.1470 |
+| e2 | 0.0258 | 0.1020 |
+| e3 | 0.0251 | 0.1020 |
+| e4 | 0.0293 | 0.1833 |
+| e5 | 0.0228 | 0.0980 |
+| e6 | 0.0325 | 0.3923 |
 
 ## E5 attrition
-Questions with zero valid E5 samples: 15
-  Q-S-026-03, Q-S-032-02, Q-S-034-03, Q-S-035-01, Q-S-036-01, Q-S-037-01, Q-S-037-03, Q-S-038-01, Q-S-038-02, Q-S-039-01, Q-S-039-02, Q-S-040-01, Q-S-040-02, Q-S-041-01, Q-S-041-02
+Questions with zero valid E5 samples: 0

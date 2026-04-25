@@ -1,0 +1,5 @@
+usage: run_experiment.py [-h] --experiment {e1,e1p,e2,e3,e4,e5}
+                         [--config CONFIG] [--out OUT] [--limit LIMIT]
+                         [--qid QID] [--samples SAMPLES] [--no-resume]
+                         [--dry-run] [--concurrency CONCURRENCY]
+run_experiment.py: error: argument --experiment: invalid choice: 'e6' (choose from e1, e1p, e2, e3, e4, e5)
